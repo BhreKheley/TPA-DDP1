@@ -59,3 +59,59 @@ Dokumen ini mencatat proses peer review dan penggabungan cabang fitur (*feature 
 
 ---
 
+## Pull Request #2: Algoritma Anggaran Knapsack DP & Pengujian Pytest
+
+- **Judul PR**: `feat(core,tests): knapsack 0/1 dynamic programming budget optimizer and test suite`
+- **Cabang Asal**: `feature/budget-algorithm`
+- **Cabang Tujuan**: `main`
+- **Author**: Bhre Nabil Faeyza (@BhreKheley - `bhrenabil@gmail.com`)
+- **Reviewer**: Johannes Praba Aji (@Ojokz - `johannespraba25@gmail.com`)
+- **Status**: **APPROVED**
+- **Tanggal Review**: 17 November 2026
+
+### 1. Ringkasan Perubahan
+- Mengimplementasikan mesin optimasi anggaran di `core/budget.py`:
+  - `MealCombination`: Dataclass paket menu hasil optimasi (daftar item, total harga, sisa uang, total skor kepuasan, status exact match, dan tipe paket).
+  - `RecommendationResult`: Container status hasil rekomendasi (`SUCCESS`, `INSUFFICIENT_BUDGET`, `NO_MATCHING_ITEMS`), nominal defisit, harga termurah, dan rekomendasi alternatif.
+  - `knapsack_01_dp`: Algoritma 0/1 Knapsack murni dengan tabel DP dua dimensi, optimasi penskalaan FPB (GCD), dan penelusuran balik (*backtracking*).
+  - `recommend_meals`: Logika pemilihan paket kombo seimbang (1 Makanan + 1 Minuman) per kantin, peringkat Top-K, kalkulasi defisit jika anggaran tidak cukup, dan fallback fleksibel.
+- Menyusun rangkaian pengujian komprehensif di `tests/`:
+  - `tests/conftest.py`: Fixture data uji merchant dan item sintetis.
+  - `tests/test_budget.py`: Pengujian matematis optimasi DP vs greedy, uji skala FPB, uji kecocokan pas (`budget_remaining == 0`), filter kantin dan diet, serta stabilitas input besar.
+
+### 2. Checklist Pemeriksaan Reviewer
+
+| Butir Evaluasi | Kriteria | Hasil Uji | Status |
+|---|---|---|---|
+| Optimalitas Knapsack | Menemukan solusi optimal yang gagal ditemukan greedy | Lolos pengujian kontra-contoh klasik greedy | PASS |
+| Efisiensi FPB (GCD) | Skala harga Rupiah ribuan tanpa membebani RAM | Berjalan di bawah 15ms untuk anggaran hingga Rp 100.000 | PASS |
+| Aturan Kombo Seimbang | Menyajikan minimal 1 Makanan + 1 Minuman saat `require_combo=True` | Terverifikasi paket kombo selalu memuat makanan dan minuman | PASS |
+| Perhitungan Defisit | Menghitung selisih uang kurang jika budget tidak cukup | Budget Rp 5.000 dengan paket termurah Rp 10.000 menghasilkan defisit Rp 5.000 | PASS |
+| Label Pas di Kantong | Menandai `is_exact_match` jika total harga pas dengan budget | Terverifikasi bendera exact match aktif saat sisa Rp 0 | PASS |
+| Filter Kantin & Diet | Menyaring ketat sesuai kantin dan preferensi halal/vegetarian | Terverifikasi hanya menu yang cocok yang masuk kombinasi | PASS |
+| Eksekusi Pytest | Seluruh rangkaian uji unit algoritma berjalan hijau | Pengujian di `tests/test_budget.py` lolos 100% | PASS |
+
+### 3. Komentar Reviewer (Johannes Praba Aji)
+> *"Algoritma knapsack DP-nya udah gw test run Bhre. Scaling FPB (GCD)-nya pinter bgt, jadi komputasi tabel DP tetep enteng di memori meskipun budget puluhan ribu. Logika kalkulasi defisit pas budget user mepet juga ngebantu bgt buat di frontend nanti biar gak kosong doang halamannya.*
+>
+> *Penanganan fallback kalau budget mepet (kayak 10rb) juga rapih, jadi mahasiswa tetep dapet rekomendasi menu hemat atau camilan kenyang. 163 pytest passing tanpa error. LGTM, langsung gue merge ke main!"*
+
+### 4. Keputusan Penggabungan
+- **Disetujui oleh**: Johannes Praba Aji pada 17 November 2026.
+- **Aksi Merge**: Digabung ke `main` menggunakan merge commit non-fast-forward (`--no-ff`).
+
+---
+
+## Pull Request #3: Aplikasi Web Flask, Desain Mobile-First UI & Pipeline CI/CD
+
+- **Judul PR**: `feat(app,ci): Flask web application, Makara UI templates, and GitHub Actions CI workflow`
+- **Cabang Asal**: `feature/web-app-and-ci`
+- **Cabang Tujuan**: `main`
+- **Author**: Johannes Praba Aji (@Ojokz - `johannespraba25@gmail.com`)
+- **Reviewer**: Naisya Alikha Putri (@naisyaalika - `naisyaa.alikha@gmail.com`)
+- **Status**: **APPROVED**
+- **Tanggal Review**: 21 November 2026
+
+### 1. Ringkasan Perubahan
+- Mengembangkan antarmuka web interaktif menggunakan Flask di `app/`:
+  - `app/__init__.py`: Factory `create_app` dan filter Jinja `format_rupiah`.
