@@ -1,0 +1,81 @@
+{# Macro SVG Icons Khusus Proyek Smart Meal Finder UI
+   Tanpa emoji, murni geometric vector SVG berdaya visual tajam dan aksesibel.
+#}
+
+{% macro icon(name, size=16, class="") %}
+{% if name == "location" or name == "canteen" %}
+<svg class="ui-icon ui-icon-location {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+    <circle cx="12" cy="10" r="3"/>
+</svg>
+{% elif name == "food" %}
+<svg class="ui-icon ui-icon-food {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M18 10a6 6 0 0 1-12 0v-2h12v2Z"/>
+    <path d="M6 10v2a6 6 0 0 0 12 0v-2"/>
+    <path d="M10 4v2"/>
+    <path d="M14 4v2"/>
+    <path d="M4 18h16"/>
+</svg>
+{% elif name == "beverage" %}
+<svg class="ui-icon ui-icon-beverage {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M17 8h1a3 3 0 0 1 0 6h-1"/>
+    <path d="M5 8h12v9a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z"/>
+    <line x1="6" y1="2" x2="6" y2="4"/>
+    <line x1="10" y1="2" x2="10" y2="4"/>
+    <line x1="14" y1="2" x2="14" y2="4"/>
+</svg>
+{% elif name == "snack" %}
+<svg class="ui-icon ui-icon-snack {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="9"/>
+    <circle cx="8" cy="11" r="1.5" fill="currentColor"/>
+    <circle cx="13" cy="8" r="1.5" fill="currentColor"/>
+    <circle cx="15" cy="14" r="1.5" fill="currentColor"/>
+    <circle cx="10" cy="16" r="1.5" fill="currentColor"/>
+</svg>
+{% elif name == "wallet" or name == "budget" %}
+<svg class="ui-icon ui-icon-wallet {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3v3a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2V6"/>
+    <circle cx="18" cy="14" r="1" fill="currentColor"/>
+</svg>
+{% elif name == "search" %}
+<svg class="ui-icon ui-icon-search {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="8"/>
+    <path d="m21 21-4.3-4.3"/>
+</svg>
+{% elif name == "star" %}
+<svg class="ui-icon ui-icon-star {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+</svg>
+{% elif name == "alert" or name == "warning" %}
+<svg class="ui-icon ui-icon-alert {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+    <line x1="12" y1="9" x2="12" y2="13"/>
+    <line x1="12" y1="17" x2="12.01" y2="17"/>
+</svg>
+{% elif name == "check" %}
+<svg class="ui-icon ui-icon-check {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <polyline points="20 6 9 17 4 12"/>
+</svg>
+{% elif name == "arrow-left" %}
+<svg class="ui-icon ui-icon-arrow-left {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <line x1="19" y1="12" x2="5" y2="12"/>
+    <polyline points="12 19 5 12 12 5"/>
+</svg>
+{% elif name == "arrow-right" %}
+<svg class="ui-icon ui-icon-arrow-right {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <line x1="5" y1="12" x2="19" y2="12"/>
+    <polyline points="12 5 19 12 12 19"/>
+</svg>
+{% elif name == "clock" %}
+<svg class="ui-icon ui-icon-clock {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+</svg>
+{% elif name == "makara" %}
+<svg class="ui-icon ui-icon-makara {{ class }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
+    <path d="M12 2L14.5 7H9.5L12 2Z"/>
+    <path d="M5 9L9 8L8 14H16L15 8L19 9L17 17H7L5 9Z"/>
+    <rect x="6" y="19" width="12" height="2" rx="1"/>
+</svg>
+{% endif %}
+{% endmacro %}
