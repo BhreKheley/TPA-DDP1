@@ -115,3 +115,37 @@ Dokumen ini mencatat proses peer review dan penggabungan cabang fitur (*feature 
 ### 1. Ringkasan Perubahan
 - Mengembangkan antarmuka web interaktif menggunakan Flask di `app/`:
   - `app/__init__.py`: Factory `create_app` dan filter Jinja `format_rupiah`.
+  - `app/routes.py`: Rute controller untuk `/`, `/recommend`, `/merchants`, `/api/recommend`, dan `/api/merchants`.
+  - `app/templates/`:
+    - `base.html`: Kerangka induk navigasi responsif, branding Makara UI, dan footer.
+    - `index.html`: Form pencarian anggaran, preset nominal saku (Rp 10.000, Rp 15.000, Rp 20.000, Rp 25.000), filter kantin, dan pilihan format kombo vs fleksibel.
+    - `results.html`: Kartu rekomendasi paket menu, visualisasi persentase anggaran, indikator pas di kantong, banner defisit informatif, dan rekomendasi alternatif menu hemat.
+    - `merchants.html`: Direktori interaktif 6 kantin kampus UI.
+    - `error.html`: Halaman error 400/404 ramah pengguna.
+  - `app/static/`:
+    - `css/style.css`: Desain responsif bertema kuning Makara UI (`#FFC700`) dan slate cards, dioptimalkan untuk tampilan smartphone (target sentuh $\ge 44$px, tanpa scroll horizontal bocor).
+    - `js/main.js`: Interaktivitas pratinjau nominal Rupiah live dan pemilihan preset chip.
+- Menambahkan rangkaian pengujian integrasi web di `tests/test_app.py` dan uji E2E di `tests/e2e/`.
+- Mengonfigurasi pipeline otomatisasi CI di `.github/workflows/ci.yml` (matriks Python 3.10, 3.11, 3.12).
+
+### 2. Checklist Pemeriksaan Reviewer
+
+| Butir Evaluasi | Kriteria | Hasil Uji | Status |
+|---|---|---|---|
+| Arsitektur Flask | Application factory pattern dengan filter Rupiah | `create_app()` berfungsi normal; `format_rupiah` memformat Rp 15.000 | PASS |
+| Rute & Respons | Seluruh rute mengembalikan HTTP 200 dan konten valid | Terverifikasi pada browser dan test client | PASS |
+| Desain Mobile-First | Tampilan nyaman di layar HP 375px+ | Elemen menyusun rapi ke bawah (*stacked*), tombol mudah disentuh | PASS |
+| Bebas AI Slop | Tanpa emoji generik dan tanpa kartu mengambang aneh | Menggunakan sistem ikon vektor SVG murni di `macros/icons.html` | PASS |
+| Penanganan Defisit | Memberikan opsi menu hemat saat budget mepet | Budget Rp 10.000 menampilkan opsi menu hemat yang tersedia | PASS |
+| REST API | Endpoint `/api/recommend` menyajikan data JSON terstruktur | Teruji valid dengan status HTTP 200 dan 400 untuk input cacat | PASS |
+| Workflow CI/CD | Menjalankan linting dan pytest otomatis di GitHub | Berkas `.github/workflows/ci.yml` tervalidasi | PASS |
+| Uji Terintegrasi | Lolos seluruh pengujian unit, rute web, dan E2E | 163 test cases berhasil 100% | PASS |
+
+### 3. Komentar Reviewer (Naisya Alikha Putri)
+> *"Tampilan web Flask-nya cakep Jo, tema kuning Makara sama kartu slate-nya dapet bgt vibes kampus UI. Layout di HP juga enak dipake satu tangan, input form-nya responsif.*
+>
+> *Sistem icon SVG buatan sendiri bikin tampilannya rapih dan gak generik. Pas budget mepet (kayak 10rb), halamannya gak kosong melompong tapi langsung ngasih rekomendasi menu hemat yang beneran kebeli di kantin. Pipeline CI GitHub Actions di `.github/workflows/ci.yml` juga langsung ijo pas push. Siap buat final testing bareng!"*
+
+### 4. Keputusan Penggabungan
+- **Disetujui oleh**: Naisya Alikha Putri pada 21 November 2026.
+- **Aksi Merge**: Digabung ke `main` menggunakan merge commit non-fast-forward (`--no-ff`).
