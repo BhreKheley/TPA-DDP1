@@ -176,3 +176,50 @@ def test_is_open_past_midnight_spills_into_next_day():
     assert is_open(HOURS, friday_late) is True
     assert is_open(HOURS, saturday_early) is True
     assert is_open(HOURS, saturday_early.replace(hour=3)) is False
+
+
+# ---- loader: updated_at dan open_hours opsional ----------------------------
+
+def _write_dataset(tmp_path, item_extra=None, merchant_extra=None):
+    import json
+    item = {"id": "i1", "name": "Teh", "category": "beverage", "price": 3000, "satisfaction_score": 70}
+    item.update(item_extra or {})
+    merchant = {"id": "m1", "name": "Alfa", "canteen_name": "Kantin A", "faculty": "F", "rating": 4.0, "items": [item]}
+    merchant.update(merchant_extra or {})
+    path = tmp_path / "data.json"
+    path.write_text(json.dumps([merchant]), encoding="utf-8")
+    return path
+
+
+def test_loader_accepts_data_without_optional_fields(tmp_path):
+    from core.loader import load_merchants
+    m = load_merchants(_write_dataset(tmp_path))[0]
+    assert m.open_hours is None and m.items[0].updated_at is None
+
+
+def test_loader_reads_updated_at_and_open_hours(tmp_path):
+    from core.loader import load_merchants
+    path = _write_dataset(tmp_path, {"updated_at": "2026-11-22"}, {"open_hours": {"senin": ["08:00", "16:00"]}})
+    m = load_merchants(path)[0]
+    assert m.items[0].updated_at == "2026-11-22"
+    assert m.open_hours == {"senin": ("08:00", "16:00")}
+
+
+@pytest.mark.parametrize("bad", ["22-11-2026", "2026-13-40", 20261122])
+def test_loader_rejects_bad_updated_at(tmp_path, bad):
+    from core.loader import DataValidationError, load_merchants
+    with pytest.raises(DataValidationError, match="updated_at"):
+        load_merchants(_write_dataset(tmp_path, {"updated_at": bad}))
+
+
+@pytest.mark.parametrize("bad", [
+    {"minggu2": ["08:00", "16:00"]},
+    {"senin": ["8:00", "16:00"]},
+    {"senin": ["08:00", "08:00"]},
+    {"senin": ["08:00"]},
+    ["08:00", "16:00"],
+])
+def test_loader_rejects_bad_open_hours(tmp_path, bad):
+    from core.loader import DataValidationError, load_merchants
+    with pytest.raises(DataValidationError, match="open_hours"):
+        load_merchants(_write_dataset(tmp_path, merchant_extra={"open_hours": bad}))

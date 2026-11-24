@@ -18,10 +18,15 @@ Kontributor:
 """
 
 from dataclasses import dataclass, field
+from datetime import date
 from enum import Enum
 import json
 from pathlib import Path
-from typing import FrozenSet, List, Optional, Set, Union
+import re
+from typing import Any, Dict, FrozenSet, List, Optional, Set, Tuple, Union
+
+DAY_NAMES = ("senin", "selasa", "rabu", "kamis", "jumat", "sabtu", "minggu")
+_HHMM = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 
 
 class Category(str, Enum):
@@ -69,6 +74,7 @@ class MenuItem:
         calories: Optional estimated caloric content in kcal.
         description: Informative description of the item.
         is_available: Operational availability status (default True).
+        updated_at: Optional survey date of the price, 'YYYY-MM-DD'. Left None until recorded.
     """
     id: str
     name: str
@@ -83,9 +89,20 @@ class MenuItem:
     calories: Optional[int] = None
     description: str = ""
     is_available: bool = True
+    updated_at: Optional[str] = None
 
     def __post_init__(self) -> None:
         """Enforces type and value invariants for frozen MenuItem."""
+        if self.updated_at is not None:
+            try:
+                if not isinstance(self.updated_at, str):
+                    raise ValueError
+                date.fromisoformat(self.updated_at)
+            except ValueError:
+                raise DataValidationError(
+                    f"Item '{self.name}' updated_at harus berformat YYYY-MM-DD, got {self.updated_at!r}"
+                )
+
         # Normalize dietary_tags to frozenset of lowercased strings
         if not isinstance(self.dietary_tags, frozenset):
             tags = (
@@ -118,6 +135,8 @@ class Merchant:
         rating: Customer rating between 0.0 and 5.0.
         items: List of MenuItem objects offered by this merchant.
         description: Brief description of the merchant stall and specialties.
+        open_hours: Optional map of day name ('senin'..'minggu') to ('HH:MM', 'HH:MM').
+            A close time earlier than the open time means the stall closes after midnight.
     """
     id: str
     name: str
@@ -127,6 +146,30 @@ class Merchant:
     rating: float
     items: List[MenuItem] = field(default_factory=list)
     description: str = ""
+    open_hours: Optional[Dict[str, Tuple[str, str]]] = None
+
+
+def _parse_open_hours(raw: Any, merchant_name: str) -> Optional[Dict[str, Tuple[str, str]]]:
+    """Validates the optional open_hours object of a merchant and returns day -> (open, close)."""
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise DataValidationError(f"Merchant '{merchant_name}' open_hours harus berupa objek hari -> [buka, tutup]")
+    parsed: Dict[str, Tuple[str, str]] = {}
+    for day, window in raw.items():
+        if day not in DAY_NAMES:
+            raise DataValidationError(f"Merchant '{merchant_name}' open_hours hari tidak dikenal: {day!r}")
+        if (
+            not isinstance(window, (list, tuple))
+            or len(window) != 2
+            or not all(isinstance(t, str) and _HHMM.match(t) for t in window)
+            or window[0] == window[1]
+        ):
+            raise DataValidationError(
+                f"Merchant '{merchant_name}' open_hours {day!r} harus [HH:MM, HH:MM] dengan jam berbeda, got {window!r}"
+            )
+        parsed[day] = (window[0], window[1])
+    return parsed or None
 
 
 def load_merchants(filepath: Union[str, Path], strict: bool = True) -> List[Merchant]:
@@ -280,6 +323,7 @@ def load_merchants(filepath: Union[str, Path], strict: bool = True) -> List[Merc
                 calories=calories,
                 description=str(it_desc),
                 is_available=bool(is_available),
+                updated_at=it_dict.get("updated_at"),
             )
             parsed_items.append(menu_item)
 
@@ -292,6 +336,7 @@ def load_merchants(filepath: Union[str, Path], strict: bool = True) -> List[Merc
             rating=rating,
             items=parsed_items,
             description=str(description),
+            open_hours=_parse_open_hours(m_dict.get("open_hours"), m_name),
         )
         merchants.append(merchant)
 
