@@ -53,15 +53,16 @@
     <form action="/recommend" method="POST" class="inline-search-form">
         <div class="inline-input-group">
             <label for="refine-budget" class="sr-only">Ubah Budget:</label>
-            <input 
-                type="number" 
-                name="budget" 
-                id="refine-budget" 
-                class="form-control form-control-sm" 
-                placeholder="Ganti Budget (Rp)" 
-                value="{{ budget }}" 
-                min="0"
-                step="1000"
+            <input
+                type="text"
+                inputmode="numeric"
+                name="budget"
+                id="refine-budget"
+                class="form-control form-control-sm"
+                placeholder="Ganti Budget (Rp)"
+                value="{{ budget }}"
+                data-rupiah
+                autocomplete="off"
                 required
             >
             <select name="canteen" class="form-control form-control-sm">
@@ -77,6 +78,33 @@
         </div>
     </form>
 </section>
+
+<!-- Merchant yang terjangkau, per kantin (P0): minimal satu menu berharga <= budget -->
+{% if groups %}
+<section class="affordable-section" id="kantin-terjangkau" aria-labelledby="affordable-title">
+    <div class="section-title-wrap">
+        <h2 id="affordable-title">Kantin yang terjangkau dengan {{ budget | format_rupiah }}</h2>
+        <p class="text-muted">{{ groups | map(attribute='hits') | map('length') | sum }} merchant punya menu yang muat di anggaranmu. Urut per kantin, lalu menurut nama.</p>
+    </div>
+    {% for group in groups %}
+    <div class="canteen-group">
+        <h3 class="canteen-group-title">{{ icon("canteen", size=16) }} {{ group.canteen }}</h3>
+        <ul class="hit-list">
+            {% for hit in group.hits %}
+            {% set fresh = freshness(hit.fitting_items[0].updated_at) %}
+            <li class="hit-card">
+                <a class="hit-link" href="/merchant/{{ hit.merchant.id }}?budget={{ budget }}">
+                    <span class="hit-name">{{ hit.merchant.name }}</span>
+                    <span class="hit-price">mulai {{ hit.cheapest_price | format_rupiah }}</span>
+                    <span class="hit-meta">{{ hit.fitting_items | length }} menu muat. <span class="{% if fresh.stale %}stale-note{% endif %}">{{ fresh.text }}</span></span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
 
 <!-- Kasus 1: SUCCESS (Ditemukan Paket yang Terjangkau) -->
 {% if result and result.status == "SUCCESS" %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% from "macros/icons.html" import icon %}
+
+{% block title %}{{ merchant.name }} | Smart Meal Finder UI{% endblock %}
+
+{% block content %}
+<section class="detail-header">
+    <div class="header-breadcrumbs">
+        <a href="{% if budget %}/recommend?budget={{ budget }}{% else %}/merchants{% endif %}" class="back-link">
+            {{ icon("arrow-left", size=14) }}
+            <span>{% if budget %}Kembali ke hasil {{ budget | format_rupiah }}{% else %}Kembali ke daftar kantin{% endif %}</span>
+        </a>
+    </div>
+    <h1 class="page-title">{{ merchant.name }}</h1>
+    <p class="detail-sub">
+        {{ icon("canteen", size=15) }} {{ merchant.canteen_name }}, {{ merchant.faculty }}
+        {% if open_now is not none %}
+        <span class="open-status {{ 'is-open' if open_now else 'is-closed' }}">{{ 'Buka sekarang' if open_now else 'Tutup sekarang' }}</span>
+        {% endif %}
+    </p>
+    {% if merchant.description %}<p class="text-muted">{{ merchant.description }}</p>{% endif %}
+    {% if merchant.open_hours %}
+    <details class="hours-box">
+        <summary>Jam buka</summary>
+        <ul>
+            {% for day, win in merchant.open_hours.items() %}<li>{{ day | capitalize }}: {{ win[0] }} sampai {{ win[1] }}</li>{% endfor %}
+        </ul>
+    </details>
+    {% endif %}
+</section>
+
+{% if budget %}
+<section class="detail-section" aria-labelledby="fit-title">
+    <h2 id="fit-title">Menu yang muat di {{ budget | format_rupiah }}</h2>
+    {% if fitting %}
+    <ul class="menu-list">
+        {% for it in fitting %}
+        {% set fresh = freshness(it.updated_at) %}
+        <li class="menu-row">
+            <span class="menu-name">{{ it.name }}</span>
+            <span class="menu-price">{{ it.price | format_rupiah }}</span>
+            <span class="menu-fresh {% if fresh.stale %}stale-note{% endif %}">{{ fresh.text }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% elif cheapest %}
+    <p class="empty-note">Belum ada menu yang muat. Menu termurah di sini {{ cheapest | format_rupiah }}, kurang {{ (cheapest - budget) | format_rupiah }} dari anggaranmu.</p>
+    {% else %}
+    <p class="empty-note">Merchant ini belum punya menu tersedia di data kami.</p>
+    {% endif %}
+</section>
+
+{% if combo %}
+<section class="detail-section" aria-labelledby="combo-title">
+    <h2 id="combo-title">Kombinasi terlengkap dalam anggaran</h2>
+    <p class="text-muted">Memilih menu dari sebanyak mungkin kategori, total tidak melebihi {{ budget | format_rupiah }}.</p>
+    <ul class="menu-list">
+        {% for it in combo %}<li class="menu-row"><span class="menu-name">{{ it.name }}</span><span class="menu-price">{{ it.price | format_rupiah }}</span></li>{% endfor %}
+    </ul>
+    <p class="combo-sum">Total {{ combo_total | format_rupiah }}, sisa {{ (budget - combo_total) | format_rupiah }}</p>
+</section>
+{% endif %}
+{% else %}
+<section class="detail-section" aria-labelledby="all-title">
+    <h2 id="all-title">Semua menu tersedia</h2>
+    <ul class="menu-list">
+        {% for it in fitting %}
+        <li class="menu-row"><span class="menu-name">{{ it.name }}</span><span class="menu-price">{{ it.price | format_rupiah }}</span></li>
+        {% else %}
+        <li class="empty-note">Belum ada menu tersedia.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+{% endblock %}

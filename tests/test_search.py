@@ -223,3 +223,35 @@ def test_loader_rejects_bad_open_hours(tmp_path, bad):
     from core.loader import DataValidationError, load_merchants
     with pytest.raises(DataValidationError, match="open_hours"):
         load_merchants(_write_dataset(tmp_path, merchant_extra={"open_hours": bad}))
+
+
+# ---- Rute web V2 ----
+import pytest
+from app import create_app
+
+
+@pytest.fixture()
+def client():
+    return create_app().test_client()
+
+
+@pytest.mark.parametrize("raw,code", [("15.000", 200), ("Rp 15.000", 200), ("15000", 200), ("0", 400), ("-5", 400), ("abc", 400), ("", 400)])
+def test_recommend_budget_validation(client, raw, code):
+    assert client.get("/recommend", query_string={"budget": raw}).status_code == code
+
+
+def test_results_grouped_per_canteen_with_detail_link(client):
+    html = client.get("/recommend?budget=15000").get_data(as_text=True)
+    assert 'id="kantin-terjangkau"' in html
+    assert "/merchant/" in html
+
+
+def test_results_empty_state_shows_gap(client):
+    html = client.get("/recommend?budget=500").get_data(as_text=True)
+    assert "kantin-terjangkau" not in html
+
+
+def test_merchant_detail_ok_and_404(client):
+    assert client.get("/merchant/m_dallas_01?budget=15000").status_code == 200
+    assert client.get("/merchant/m_dallas_01").status_code == 200
+    assert client.get("/merchant/tidak-ada").status_code == 404

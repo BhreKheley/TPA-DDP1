@@ -13,9 +13,12 @@ Kontributor:
 - Bhre Nabil Faeyza (NPM: 2606887563) - Reviewer PR #3 & Integrasi Logika
 """
 
-from typing import List, Optional, Set
+from datetime import datetime, timedelta, timezone
+import re
+from typing import Any, Dict, List, Optional, Set
 from flask import (
     Blueprint,
+    abort,
     current_app,
     jsonify,
     render_template,
@@ -23,9 +26,53 @@ from flask import (
 )
 
 from core.budget import recommend_meals
+from core.search import affordable_merchants, best_combo, cheapest_gap, is_open, is_stale
 
 # Inisialisasi Blueprint Flask untuk modularitas rute aplikasi
 main_bp = Blueprint("main", __name__)
+
+# WIB tetap UTC+7 (Indonesia tanpa DST); tidak memakai zoneinfo agar jalan di Windows tanpa paket tzdata.
+WIB = timezone(timedelta(hours=7))
+MAX_BUDGET = 10_000_000
+_BUDGET_FORMAT = re.compile(r"^(\d{1,3}([.,\s]\d{3})+|\d+)$")
+
+
+class BudgetError(ValueError):
+    """Nominal anggaran tidak valid. `title` dan `message` siap tampil ke pengguna."""
+
+    def __init__(self, title: str, message: str) -> None:
+        super().__init__(message)
+        self.title = title
+        self.message = message
+
+
+def parse_budget(raw: Any) -> int:
+    """Mengubah input nominal ('15000', '15.000', 'Rp 15.000') menjadi bilangan bulat positif."""
+    text = re.sub(r"^rp\.?\s*", "", str(raw or "").strip(), flags=re.IGNORECASE)
+    if not text:
+        raise BudgetError("Input Budget Wajib Diisi", "Ketik nominal uang makanmu, misalnya 15.000.")
+    if text.startswith("-") and text[1:].isdigit():
+        raise BudgetError("Budget Negatif", "Nominal tidak boleh negatif. Ketik angka positif, misalnya 15.000.")
+    if not _BUDGET_FORMAT.match(text):
+        raise BudgetError(
+            "Format Budget Tidak Valid",
+            "Gunakan angka bulat saja, misalnya 15000 atau 15.000. Hapus huruf dan simbol lain.",
+        )
+    value = int(re.sub(r"[.,\s]", "", text))
+    if value == 0:
+        raise BudgetError("Budget Harus Lebih dari Nol", "Nominal 0 tidak bisa dicari. Isi minimal harga satu menu, misalnya 5.000.")
+    if value > MAX_BUDGET:
+        raise BudgetError("Budget Terlalu Besar", "Nominal maksimal Rp 10.000.000. Ketik uang makan harianmu.")
+    return value
+
+
+@main_bp.app_template_global("freshness")
+def freshness(updated_at: Optional[str]) -> Dict[str, Any]:
+    """Label kesegaran harga untuk template: tanggal pembaruan, atau penanda usang setelah 1 bulan."""
+    stale = is_stale(updated_at, today=datetime.now(WIB).date())
+    if stale is None:
+        return {"text": "Tanggal harga belum tercatat", "stale": False}
+    return {"text": f"Harga per {updated_at}" + (", mungkin sudah berubah" if stale else ""), "stale": stale}
 
 
 def _extract_canteen_list(merchants) -> List[str]:
@@ -102,32 +149,10 @@ def recommend():
         )
 
     # 1. Validasi Input Anggaran (Budget)
-    if raw_budget is None or str(raw_budget).strip() == "":
-        return render_template(
-            "error.html",
-            code=400,
-            title="Input Budget Wajib Diisi",
-            message="Silakan masukkan nominal anggaran belanja makan yang ingin dicari.",
-        ), 400
-
-    clean_budget_str = str(raw_budget).strip()
     try:
-        budget_val = int(clean_budget_str)
-    except ValueError:
-        return render_template(
-            "error.html",
-            code=400,
-            title="Format Budget Tidak Valid",
-            message="Nominal anggaran harus berupa angka Rupiah bulat tanpa simbol mata uang atau huruf.",
-        ), 400
-
-    if budget_val < 0:
-        return render_template(
-            "error.html",
-            code=400,
-            title="Budget Negatif",
-            message="Nominal anggaran tidak boleh bernilai negatif.",
-        ), 400
+        budget_val = parse_budget(raw_budget)
+    except BudgetError as err:
+        return render_template("error.html", code=400, title=err.title, message=err.message), 400
 
     # 2. Ekstraksi Filter Kantin & Tag Diet
     canteen = source.get("canteen", "").strip() or None
@@ -152,8 +177,11 @@ def recommend():
         require_combo=require_combo,
     )
 
+    groups = affordable_merchants(merchants, budget_val, canteen=canteen, tags=set(dietary_tags) if dietary_tags else None)
     return render_template(
         "results.html",
+        groups=groups,
+        gap=None if groups else cheapest_gap(merchants, budget_val),
         result=result,
         budget=budget_val,
         canteen=canteen or "Semua Kantin UI",
@@ -190,6 +218,30 @@ def merchants_catalog():
     )
 
 
+@main_bp.route("/merchant/<merchant_id>", methods=["GET"])
+def merchant_detail(merchant_id: str):
+    """Detail merchant: menu yang muat di anggaran, kombinasi terbaik, jam buka, dan kesegaran harga."""
+    merchant = next((m for m in current_app.get_merchants() if m.id == merchant_id), None)
+    if merchant is None:
+        abort(404)
+    try:
+        budget = parse_budget(request.args.get("budget")) if request.args.get("budget") else None
+    except BudgetError:
+        budget = None
+    menu = sorted((it for it in merchant.items if it.is_available), key=lambda it: (it.price, it.name))
+    combo = best_combo(menu, budget) if budget else ()
+    return render_template(
+        "merchant_detail.html",
+        merchant=merchant,
+        budget=budget,
+        fitting=[it for it in menu if budget is None or it.price <= budget],
+        combo=combo,
+        combo_total=sum(it.price for it in combo),
+        open_now=is_open(merchant.open_hours, datetime.now(WIB)),
+        cheapest=menu[0].price if menu else None,
+    )
+
+
 @main_bp.route("/api/recommend", methods=["GET"])
 def api_recommend():
     """Endpoint REST API: Mengembalikan rekomendasi menu dalam format JSON."""
@@ -198,12 +250,9 @@ def api_recommend():
         return jsonify({"status": "ERROR", "message": "Parameter 'budget' wajib disertakan."}), 400
 
     try:
-        budget_val = int(str(raw_budget).strip())
-    except ValueError:
-        return jsonify({"status": "ERROR", "message": "Parameter 'budget' harus berupa bilangan bulat valid."}), 400
-
-    if budget_val <= 0:
-        return jsonify({"status": "ERROR", "message": "Parameter 'budget' harus lebih besar dari 0."}), 400
+        budget_val = parse_budget(raw_budget)
+    except BudgetError as err:
+        return jsonify({"status": "ERROR", "message": f"Parameter 'budget' tidak valid. {err.message}"}), 400
 
     canteen = request.args.get("canteen", "").strip() or None
     dietary_tags = _parse_dietary_params(request.args)

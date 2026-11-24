@@ -16,11 +16,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 2. Format Currency Helper
-    function formatRupiahDisplay(amount) {
-        if (!amount || isNaN(amount)) return 'Rp 0';
-        var num = parseInt(amount, 10);
-        return 'Rp ' + num.toLocaleString('id-ID');
+    function digitsOnly(text) {
+        return String(text || '').replace(/\D/g, '');
     }
+    function groupThousands(digits) {
+        return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+    function formatRupiahDisplay(amount) {
+        var digits = digitsOnly(amount);
+        return digits ? 'Rp ' + groupThousands(digits) : 'Rp 0';
+    }
+
+    // Semua input [data-rupiah] diformat ribuan saat mengetik ("15000" jadi "15.000")
+    document.querySelectorAll('input[data-rupiah]').forEach(function (input) {
+        function reformat() { input.value = groupThousands(digitsOnly(input.value)); }
+        input.addEventListener('input', reformat);
+        reformat();
+    });
 
     // 3. Live Budget Input Preview & Preset Buttons
     var budgetInput = document.getElementById('budget-input');
@@ -30,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (budgetInput && budgetPreview) {
         // Update on typing
         budgetInput.addEventListener('input', function () {
-            var val = budgetInput.value.trim();
+            var val = digitsOnly(budgetInput.value);
             budgetPreview.textContent = formatRupiahDisplay(val);
 
             // Update active preset styling
@@ -55,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var amount = chip.getAttribute('data-amount');
             var combo = chip.getAttribute('data-combo');
             if (budgetInput && amount) {
-                budgetInput.value = amount;
+                budgetInput.value = groupThousands(amount);
                 if (budgetPreview) {
                     budgetPreview.textContent = formatRupiahDisplay(amount);
                 }
