@@ -9,6 +9,14 @@
 
 Aplikasi ini menggabungkan algoritma optimasi berbasis *Dynamic Programming (0/1 Knapsack Problem)* dengan batasan kategori hidangan (1 Makanan + 1 Minuman), penanganan defisit anggaran yang informatif jika uang saku tidak mencukupi, serta antarmuka web yang intuitif dan responsif dengan tema khas Makara UI (*UI Yellow & Slate*).
 
+
+### Fitur V2 (lihat `docs/SPEC-v2.md`)
+- Merchant yang terjangkau (ada menu berharga <= nominal) dikelompokkan per kantin dan diurut menurut nama.
+- Halaman detail merchant (`/merchant/<id>`): menu yang muat, kombinasi terlengkap dalam anggaran (`core/search.py: best_combo`), jam buka dan status buka (bila data ada).
+- Label tanggal pembaruan harga, ditandai "mungkin sudah berubah" setelah lebih dari 1 bulan. Field `updated_at` dan `open_hours` di `data/merchants.json` bersifat opsional; isi dari survei asli, jangan dikarang.
+- Input nominal menerima `15000`, `15.000`, atau `Rp 15.000`; 0, negatif, dan non-angka ditolak dengan pesan perbaikan.
+- Jika tidak ada menu yang muat, halaman menampilkan harga termurah dan selisihnya.
+
 ---
 
 ## 👥 Tim Pengembang - Kelompok 5
@@ -69,7 +77,8 @@ TK DDP1/
 ├── core/
 │   ├── __init__.py
 │   ├── loader.py                # Parser dan validator dataset merchants.json
-│   └── budget.py                # Algoritma 0/1 knapsack DP & combo optimizer
+│   ├── budget.py                # Algoritma 0/1 knapsack DP & combo optimizer
+│   └── search.py                # V2: merchant terjangkau, best_combo, is_stale, is_open
 ├── data/
 │   └── merchants.json           # Dataset survei menu kantin se-UI
 ├── app/
@@ -80,6 +89,7 @@ TK DDP1/
 │   │   ├── index.html           # Halaman utama & form input budget
 │   │   ├── results.html         # Halaman hasil rekomendasi hidangan
 │   │   ├── merchants.html       # Katalog direktori kantin & stan
+│   │   ├── merchant_detail.html # V2: detail merchant
 │   │   └── error.html           # Halaman penanganan error ramah pengguna
 │   └── static/
 │       ├── css/
@@ -87,6 +97,7 @@ TK DDP1/
 │       └── js/
 │           └── main.js          # Skrip interaktivitas klien
 ├── docs/
+│   ├── SPEC-v2.md               # Delta spec V2 (tujuan, batas, kriteria sukses)
 │   └── PR_REVIEWS.md            # Dokumentasi catatan simulasi Pull Request tim
 └── tests/
     ├── __init__.py
@@ -173,7 +184,7 @@ Dataset hidangan mencakup merchant dan stan di 6 kantin utama kampus UI:
 ---
 
 ## 🤖 Catatan Penggunaan Kecerdasan Buatan (AI Usage Disclosure)
-Sesuai dengan ketentuan panduan proyek DDP1 Gasal 2026/2027, proyek ini memanfaatkan kecerdasan buatan (AI) sebagai asisten pengembangan dalam perancangan kerangka pengujian awal (*scaffolding test cases*), penataan template dasar Flask, dan dokumentasi. Seluruh logika inti (termasuk algoritma *Dynamic Programming 0/1 Knapsack*, struktur validasi data, dan integrasi rute web) telah dipelajari, dipahami, dan dapat dijelaskan secara mendalam oleh setiap anggota tim (Bhre, Naisya, dan Johannes) baik untuk modul miliknya sendiri maupun modul anggota lain tanpa membaca teks kode.
+Sesuai dengan ketentuan panduan proyek DDP1 Gasal 2026/2027, proyek ini memanfaatkan kecerdasan buatan (AI) sebagai asisten pengembangan (termasuk sesi perbaikan V2 pada branch `improve/spec-driven-v2`: `core/search.py`, rute detail merchant, dan template terkait) dalam perancangan kerangka pengujian awal (*scaffolding test cases*), penataan template dasar Flask, dan dokumentasi. Seluruh logika inti (termasuk algoritma *Dynamic Programming 0/1 Knapsack*, struktur validasi data, dan integrasi rute web) telah dipelajari, dipahami, dan dapat dijelaskan secara mendalam oleh setiap anggota tim (Bhre, Naisya, dan Johannes) baik untuk modul miliknya sendiri maupun modul anggota lain tanpa membaca teks kode.
 
 ---
 
