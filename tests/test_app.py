@@ -228,7 +228,7 @@ class TestPostRecommendForm:
         )
         assert response.status_code == 200
         html = response.get_data(as_text=True)
-        assert any(k in html.lower() for k in ["tidak ada", "tidak ditemukan", "kosong", "no matching"])
+        assert any(k in html.lower() for k in ["tidak ada", "tidak ditemukan", "kosong", "no matching", "gak ada", "cocok"])
 
 
 # ==============================================================================

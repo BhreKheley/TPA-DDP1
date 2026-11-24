@@ -41,7 +41,7 @@ class TestRealDatasetLoading:
     def test_real_merchants_canteen_coverage(self):
         merchants = load_merchants("data/merchants.json", strict=True)
         canteen_names = {m.canteen_name for m in merchants}
-        expected_canteens = {"Kantin Dallas", "Kantin Takor", "Kantin Kansas", "Kantin Pusgiwa", "Kantin Texas", "Kantin Fasilkom"}
+        expected_canteens = {"Dallas", "Takor", "Kansas", "Pusgiwa", "Kantek", "Balgebun"}
         for expected in expected_canteens:
             assert any(expected.lower() in c.lower() for c in canteen_names), f"Missing canteen {expected}"
 
