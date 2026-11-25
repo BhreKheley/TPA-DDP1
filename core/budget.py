@@ -266,6 +266,7 @@ def recommend_meals(
     dietary_preferences: Optional[List[str]] = None,
     require_combo: bool = True,
     top_k: int = 5,
+    food_only: bool = False,
 ) -> RecommendationResult:
     """Category-constrained meal recommendation optimizer.
 
@@ -281,6 +282,7 @@ def recommend_meals(
         dietary_preferences: Optional list of dietary tag requirements (e.g. ['halal']).
         require_combo: If True, enforces 1 Food + 1 Beverage balanced meal packages.
         top_k: Maximum number of ranked recommendations to return.
+        food_only: If True, restricts candidates to Food category only (Bawa Tumbler mode).
 
     Returns:
         RecommendationResult with status, recommendations list, deficit, and messages.
@@ -326,6 +328,19 @@ def recommend_meals(
             deficit=0,
             message="Tidak ada menu yang sesuai dengan filter yang dipilih.",
         )
+
+    # 2b. Bawa Tumbler mode: restrict candidates to Food items only
+    if food_only:
+        filtered_items = [it for it in filtered_items if _is_food(it)]
+        if not filtered_items:
+            return RecommendationResult(
+                status="NO_MATCHING_ITEMS",
+                budget=budget,
+                recommendations=[],
+                cheapest_item_price=0,
+                deficit=0,
+                message="Tidak ada menu makanan yang sesuai filter (mode Bawa Tumbler).",
+            )
 
     # 3. Partition items by canteen (combos must be co-located within the same canteen)
     canteen_groups: Dict[str, List[MenuItem]] = {}
@@ -419,6 +434,7 @@ def recommend_meals(
                     dietary_preferences=list(clean_tags) if clean_tags else None,
                     require_combo=False,
                     top_k=top_k,
+                    food_only=food_only,
                 )
                 if alt_res.status == "SUCCESS":
                     fallback_recs = alt_res.recommendations

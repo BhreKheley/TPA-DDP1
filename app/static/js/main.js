@@ -1,12 +1,12 @@
 /**
- * Smart Meal Finder - Interactive Client-side Script
+ * Smart Meal Finder — interactivity
  * DDP1 Kelompok 5 (Johannes Praba Aji - 2606748465)
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-    // 1. Mobile Navigation Toggle & Auto-Close
+    // ── 1. Mobile nav toggle ──────────────────────────────────────────────
     var navToggle = document.getElementById('nav-toggle');
-    var navMenu = document.getElementById('nav-menu');
+    var navMenu   = document.getElementById('nav-menu');
 
     if (navToggle && navMenu) {
         navToggle.addEventListener('click', function () {
@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
             navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
 
-        // Close menu when clicking outside or clicking any nav link
         document.querySelectorAll('.nav-link').forEach(function (link) {
             link.addEventListener('click', function () {
                 navMenu.classList.remove('open');
@@ -25,75 +24,88 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 2. Format Currency Helper
-    function formatRupiahDisplay(amount) {
+    // ── 2. Currency formatter ─────────────────────────────────────────────
+    function fmt(amount) {
         if (!amount || isNaN(amount)) return 'Rp 0';
-        var num = parseInt(amount, 10);
-        return 'Rp ' + num.toLocaleString('id-ID');
+        return 'Rp ' + parseInt(amount, 10).toLocaleString('id-ID');
     }
 
-    // 3. Live Budget Input Preview & Preset Buttons
-    var budgetInput = document.getElementById('budget-input');
+    // ── 3. Budget input ───────────────────────────────────────────────────
+    var budgetInput  = document.getElementById('budget-input');
     var budgetPreview = document.getElementById('budget-preview');
-    var presetChips = document.querySelectorAll('.preset-chip');
+    var presetChips  = document.querySelectorAll('.preset-chip');
 
     if (budgetInput && budgetPreview) {
-        // Update on typing
         budgetInput.addEventListener('input', function () {
             var val = budgetInput.value.trim();
-            budgetPreview.textContent = formatRupiahDisplay(val);
+            budgetPreview.textContent = fmt(val);
 
-            // Update active preset styling
             presetChips.forEach(function (chip) {
-                if (chip.getAttribute('data-amount') === val) {
-                    chip.classList.add('active');
-                } else {
-                    chip.classList.remove('active');
-                }
+                chip.classList.toggle('active', chip.getAttribute('data-amount') === val);
             });
         });
 
-        // Initialize preview if input has default value
         if (budgetInput.value) {
-            budgetPreview.textContent = formatRupiahDisplay(budgetInput.value);
+            budgetPreview.textContent = fmt(budgetInput.value);
         }
     }
 
-    // Preset Chip Click Handlers
+    // ── 4. Preset chip handlers ──────────────────────────────────────────
+    var flexRadio   = document.getElementById('combo-flexible');
+    var strictRadio = document.getElementById('combo-strict');
+    var tumblerRadio = document.getElementById('combo-tumbler');
+    var foodOnlyHidden = document.getElementById('food-only-hidden');
+
+    function setComboMode(combo, foodOnly) {
+        if (!flexRadio) return;
+        if (foodOnly === 'on') {
+            if (tumblerRadio) tumblerRadio.checked = true;
+            if (foodOnlyHidden) foodOnlyHidden.value = 'on';
+        } else if (combo === 'off') {
+            flexRadio.checked = true;
+            if (foodOnlyHidden) foodOnlyHidden.value = 'off';
+        } else {
+            if (strictRadio) strictRadio.checked = true;
+            if (foodOnlyHidden) foodOnlyHidden.value = 'off';
+        }
+    }
+
     presetChips.forEach(function (chip) {
         chip.addEventListener('click', function () {
-            var amount = chip.getAttribute('data-amount');
-            var combo = chip.getAttribute('data-combo');
+            var amount   = chip.getAttribute('data-amount');
+            var combo    = chip.getAttribute('data-combo');
+            var foodOnly = chip.getAttribute('data-food-only') || 'off';
+
             if (budgetInput && amount) {
                 budgetInput.value = amount;
-                if (budgetPreview) {
-                    budgetPreview.textContent = formatRupiahDisplay(amount);
-                }
+                if (budgetPreview) budgetPreview.textContent = fmt(amount);
 
                 presetChips.forEach(function (c) { c.classList.remove('active'); });
                 chip.classList.add('active');
 
-                // Auto-adjust format toggle if specified (e.g. 10k suggests flexible mode)
-                if (combo === 'off') {
-                    var flexibleRadio = document.getElementById('combo-flexible');
-                    if (flexibleRadio) flexibleRadio.checked = true;
-                } else if (combo === 'on') {
-                    var strictRadio = document.getElementById('combo-strict');
-                    if (strictRadio) strictRadio.checked = true;
-                }
-
+                setComboMode(combo, foodOnly);
                 budgetInput.focus();
             }
         });
     });
 
-    // 4. Form Submit Instant Feedback
+    // ── 5. Tumbler radio → hidden field sync ──────────────────────────────
+    // When user manually picks a radio, keep the hidden food_only field in sync
+    [flexRadio, strictRadio, tumblerRadio].forEach(function (radio) {
+        if (!radio) return;
+        radio.addEventListener('change', function () {
+            if (!foodOnlyHidden) return;
+            foodOnlyHidden.value = (radio.id === 'combo-tumbler') ? 'on' : 'off';
+        });
+    });
+
+    // ── 6. Submit feedback ────────────────────────────────────────────────
     var searchForm = document.getElementById('recommend-form');
-    var submitBtn = document.getElementById('submit-search-btn');
+    var submitBtn  = document.getElementById('submit-search-btn');
     if (searchForm && submitBtn) {
         searchForm.addEventListener('submit', function () {
             submitBtn.style.opacity = '0.85';
-            submitBtn.innerHTML = '<span>Menghitung Rekomendasi Menu...</span>';
+            submitBtn.innerHTML = '<span>Lagi dihitung...</span>';
         });
     }
 });

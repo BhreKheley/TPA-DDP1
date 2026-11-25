@@ -133,15 +133,22 @@ def recommend():
     canteen = source.get("canteen", "").strip() or None
     dietary_tags = _parse_dietary_params(source)
 
-    # 3. Pengaturan Opsi Paket Kombo (1 Makanan + 1 Minuman)
+    # 3. Pengaturan Opsi Paket Kombo (1 Makanan + 1 Minuman) atau mode Bawa Tumbler (makanan saja)
     raw_combo = source.get("require_combo")
     if raw_combo is None:
         raw_combo = source.get("combo")
+
+    # Mode "bawa_tumbler" = hanya makanan (no beverage required)
+    food_only = str(source.get("food_only", "off")).lower() in ("true", "1", "on", "yes")
 
     if raw_combo is not None:
         require_combo = str(raw_combo).lower() not in ("false", "0", "off", "no")
     else:
         require_combo = True
+
+    # food_only overrides require_combo
+    if food_only:
+        require_combo = False
 
     # 4. Panggil Mesin Algoritma Knapsack DP
     result = recommend_meals(
@@ -150,6 +157,7 @@ def recommend():
         canteen_filter=canteen,
         dietary_preferences=dietary_tags,
         require_combo=require_combo,
+        food_only=food_only,
     )
 
     return render_template(
@@ -159,6 +167,7 @@ def recommend():
         canteen=canteen or "Semua Kantin UI",
         dietary=dietary_tags or [],
         require_combo=require_combo,
+        food_only=food_only,
         deficit=result.deficit,
         cheapest_item_price=result.cheapest_item_price,
         fallback_recommendations=getattr(result, "fallback_recommendations", []),
@@ -215,6 +224,9 @@ def api_recommend():
         if raw_combo is not None
         else True
     )
+    food_only_api = str(request.args.get("food_only", "off")).lower() in ("true", "1", "on", "yes")
+    if food_only_api:
+        require_combo = False
 
     merchants = current_app.get_merchants()
     result = recommend_meals(
@@ -223,6 +235,7 @@ def api_recommend():
         canteen_filter=canteen,
         dietary_preferences=dietary_tags,
         require_combo=require_combo,
+        food_only=food_only_api,
     )
 
     return jsonify(result.to_dict()), 200
