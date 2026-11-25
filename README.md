@@ -1,181 +1,147 @@
-# Smart Meal Finder (Pencari Makanan Cerdas)
-### Tugas Pemrograman Akhir (TPA) - Dasar-Dasar Pemrograman 1 (DDP1)
-**Universitas Indonesia - Kelompok 5**
+# Smart Meal Finder (Pencari Makanan Kampus UI)
+
+**Tugas Pemrograman Akhir (TPA) — Dasar-Dasar Pemrograman 1 (DDP1) Gasal 2026/2027**  
+**Kelompok 5 — Fakultas Ilmu Komputer, Universitas Indonesia**
 
 ---
 
-## 📌 Deskripsi Proyek / Project Overview
-**Smart Meal Finder** adalah aplikasi web rekomendasi makanan berbasis anggaran (*budget-based meal recommendation*) yang dirancang khusus untuk mahasiswa Universitas Indonesia. Aplikasi ini membantu mahasiswa menemukan kombinasi makanan dan minuman optimal yang sesuai dengan batas anggaran harian mereka di berbagai kantin kampus Universitas Indonesia (Kantin Dallas, Takor, Kansas, Pusgiwa, Texas, dan Fasilkom).
+## Ringkasan Proyek
 
-Aplikasi ini menggabungkan algoritma optimasi berbasis *Dynamic Programming (0/1 Knapsack Problem)* dengan batasan kategori hidangan (1 Makanan + 1 Minuman), penanganan defisit anggaran yang informatif jika uang saku tidak mencukupi, serta antarmuka web yang intuitif dan responsif dengan tema khas Makara UI (*UI Yellow & Slate*).
+**Smart Meal Finder** adalah aplikasi web rekomendasi paket makan mahasiswa Universitas Indonesia berbasis batas uang saku harian. Aplikasi membantu mahasiswa di kampus Depok memilih kombinasi makanan dan minuman yang paling memuaskan di kantin kampus terdekat tanpa melewati anggaran yang tersedia.
+
+Sistem memodelkan pemilihan menu sebagai **0/1 Knapsack Problem** menggunakan *Dynamic Programming*, dilengkapi dengan tiga alur makan riil mahasiswa (Kombo Lengkap Makan+Minum, Mode Bawa Tumbler/Makanan Saja, serta Mode Fleksibel/Jajan Hemat), analisis selisih budget (*deficit handling*), dan direktori 6 kantin ikonik Universitas Indonesia.
 
 ---
 
-## 👥 Tim Pengembang - Kelompok 5
+## Tim Pengembang (Kelompok 5)
 
-| Nama Anggota | NPM | Akun GitHub & Email | Peran & Tanggung Jawab | Reviewer Rekan |
+| Anggota | NPM | GitHub & Email | Peran & Tanggung Jawab | Reviewer Rekan |
 |---|---|---|---|---|
-| **Bhre Nabil Faeyza** | 2606887563 | [@BhreKheley](https://github.com/BhreKheley) (`bhrenabil@gmail.com`) | Core Logic & QA (`core/budget.py`, DP Knapsack Solver, Pytest Suite) | Review kode Naisya |
-| **Naisya Alikha Putri** | 2606888276 | [@naisyaalika](https://github.com/naisyaalika) (`naisyaa.alikha@gmail.com`) | Data Modeling & UX (`data/merchants.json`, `core/loader.py`, `core/models.py`) | Review kode Johannes |
-| **Johannes Praba Aji** | 2606748465 | [@Ojokz](https://github.com/Ojokz) (`johannespraba25@gmail.com`) | Web Application & CI/CD (`app/routes.py`, Jinja Templates, CSS, GitHub Actions) | Review kode Bhre |
+| **Bhre Nabil Faeyza** | `2606887563` | [@BhreKheley](https://github.com/BhreKheley) (`bhrenabil@gmail.com`) | Ketua & Core Algorithm Lead (`core/budget.py`, 0/1 Knapsack DP, GCD scaling, Pytest suite) | Review PR #1 (Naisya) |
+| **Naisya Alikha Putri** | `2606888276` | [@naisyaalika](https://github.com/naisyaalika) (`naisyaa.alikha@gmail.com`) | Data & UX Design Lead (`data/merchants.json`, `core/loader.py`, copywriting, desain Figma) | Review PR #3 (Johannes) |
+| **Johannes Praba Aji** | `2606748465` | [@Ojokz](https://github.com/Ojokz) (`johannespraba25@gmail.com`) | Web App & QA DevOps Lead (`app/routes.py`, Jinja templates, responsive CSS/JS, CI/CD, E2E suite) | Review PR #2 (Bhre) |
 
 ---
 
-## 🎨 Desain Antarmuka & Prototipe Figma
-Desain antarmuka UI/UX dirancang khusus tanpa template generik/AI slop, menggunakan sistem warna khas Universitas Indonesia (#FFC700 Makara Yellow & Slate #0F172A), tipografi terbaca jelas, dan sistem ikon vektor SVG kustom.
-- **Tautan Figma File:** [Figma Design - Smart Meal Finder UI](https://www.figma.com/design/a3I0azJfnOlE04Z8s3TvHB)
+## Rancangan Sistem & Desain
+
+- **Blueprint Workflow & Arsitektur Tim:** [docs/ARCHITECTURE_AND_WORKFLOW.md](docs/ARCHITECTURE_AND_WORKFLOW.md)
+- **Dokumen Sistem Desain (Anti-Slop Direction):** [DESIGN.md](DESIGN.md)
+- **Prototipe Figma:** [Smart Meal Finder UI - Figma](https://www.figma.com/design/a3I0azJfnOlE04Z8s3TvHB)
 
 ---
 
-## 🏛️ Arsitektur & Algoritma Inti
+## Arsitektur Modular
 
-Sistem dibangun dengan prinsip modularitas tinggi (*separation of concerns*):
+Sistem dibangun menggunakan prinsip pemisahan tanggung jawab (*separation of concerns*):
 
-1. **Lapisan Data (`core/loader.py`)**:
-   - Membaca dan memvalidasi dataset survei lapangan kantin UI (`data/merchants.json`).
-   - Menerapkan model data berbasis *frozen dataclass* (`MenuItem`, `Merchant`) dan hierarki *custom exceptions* (`DataValidationError`).
-   - Menyediakan fungsi pemfilteran berdasarkan kantin, harga maksimum, dan preferensi diet (*halal*, *vegetarian*).
-
-2. **Lapisan Algoritma Inti (`core/budget.py`)**:
-   - Murni menggunakan pustaka standar Python (*zero external algorithmic dependencies*).
-   - **Canonical 0/1 Knapsack DP (`knapsack_01_dp`)**: Memaksimalkan skor kepuasan (*satisfaction score*) dalam batas anggaran menggunakan tabel pemrograman dinamis dengan optimasi FPB/GCD untuk efisiensi komputasi.
-   - **Category-Constrained Meal Optimizer (`recommend_meals`)**: Menghasilkan rekomendasi paket hidangan (Makanan + Minuman) dengan peringkat *Top-K*, kalkulasi defisit jika anggaran tidak mencukupi paket termurah, dan penandaan *Exact Match* ("Pas di Kantong").
-
-3. **Lapisan Presentasi Web (`app/`, `run.py`)**:
-   - Dibangun menggunakan microframework Flask dengan *application factory pattern*.
-   - Menyediakan antarmuka web interaktif (form input anggaran, filter kantin, tag diet) serta REST API (`/api/recommend`, `/api/merchants`).
-   - Desain responsif menggunakan HTML5, Jinja2 template inheritance, dan styling CSS kustom bernuansa Universitas Indonesia.
-
-4. **Pengujian Otomatis & CI/CD (`tests/`, `.github/workflows/ci.yml`)**:
-   - Pengujian unit dan integrasi end-to-end menggunakan `pytest`.
-   - Pipeline otomatis GitHub Actions yang menjalankan linting `flake8` dan pengujian `pytest` di Python 3.10, 3.11, dan 3.12.
+1. **Lapisan Data & Validator (`core/loader.py`, `core/models.py`):**
+   - Membaca dan memvalidasi dataset survei kantin UI (`data/merchants.json`).
+   - Menggunakan `@dataclass(frozen=True)` (`MenuItem`) agar objek item menu bersifat *immutable*, serta hierarki *custom exception* (`DataFileNotFoundError`, `JSONParseError`, `DataValidationError`).
+   - Menyediakan utilitas penyaringan item berdasarkan kantin, harga maksimum, dan normalisasi tag diet (`halal`, `vegetarian`, `spicy`/`pedas`, `non-spicy`).
+2. **Lapisan Algoritma Anggaran (`core/budget.py`):**
+   - Ditulis menggunakan pustaka standar Python tanpa dependensi optimasi eksternal.
+   - `knapsack_01_dp`: Memaksimalkan total *satisfaction score* dalam batas anggaran menggunakan tabel Dynamic Programming 2D dengan penskalaan FPB/GCD untuk efisiensi memori dan runtime.
+   - `recommend_meals`: Mengelompokkan kandidat per kantin agar item tetap dalam satu lokasi, mendukung mode Kombo Lengkap (`1 Makanan + 1 Minuman`), Mode Bawa Tumbler (`food_only=True`), dan Mode Fleksibel (`require_combo=False`), serta menghitung defisit dan opsi alternatif jika budget belum mencukupi paket komplit.
+3. **Lapisan Web & REST API (`app/`, `run.py`):**
+   - Dibangun dengan Flask menggunakan *application factory pattern* (`create_app`).
+   - Menyediakan antarmuka web responsif (`/`, `/recommend`, `/merchants`) serta endpoint JSON (`/api/recommend`, `/api/merchants`).
+4. **Pengujian Otomatis & CI/CD (`tests/`, `.github/workflows/ci.yml`):**
+   - Pengujian unit, rute web, dan harness 4-tier E2E (163 kasus uji pytest + 69 skenario E2E).
+   - Pipeline GitHub Actions menjalankan linting `flake8` dan pengujian `pytest` pada Python 3.10, 3.11, dan 3.12.
 
 ---
 
-## 📂 Struktur Proyek / Project Layout
+## Cakupan 6 Kantin Kampus UI Depok
 
-Sesuai dengan spesifikasi arsitektur proyek:
+Dataset `data/merchants.json` memuat **10 stan makanan dengan 41 menu (40 tersedia, 1 habis)** yang mencakup 6 kawasan kantin ikonik Universitas Indonesia:
 
-```
+1. **Dallas (Di Bawah Lindungan Allah SWT)** — FMIPA UI (di lantai bawah musala FMIPA)
+2. **Takor (Taman Korea)** — FISIP UI (area yang dulunya dikenal sebagai Balsem / Balik Semak)
+3. **Kansas (Kantin Sastra)** — FIB UI (bangunan beratap kerucut khas Fakultas Ilmu Pengetahuan Budaya)
+4. **Kantek (Kantin Teknik)** — FT UI (area Fakultas Teknik dekat Jembatan Teksas)
+5. **Balgebun (Kantin Fasilkom)** — Fasilkom UI (kantin area Balik Gedung Bundar)
+6. **Pusgiwa (Pusat Kegiatan Mahasiswa)** — Gedung Pusgiwa UI
+
+---
+
+## Struktur Direktori
+
+```text
 TK DDP1/
-├── .github/
-│   └── workflows/
-│       └── ci.yml               # Pipeline GitHub Actions CI (flake8 + pytest)
-├── .gitattributes               # Normalisasi line endings (eol=lf)
-├── .gitignore                   # Aturan pengabaian file Git
-├── README.md                    # Dokumentasi utama proyek
-├── requirements.txt             # Dependensi Python proyek
-├── run.py                       # Skrip entry point untuk menjalankan server Flask
+├── .github/workflows/ci.yml              # Pipeline GitHub Actions CI
+├── app/
+│   ├── __init__.py                       # App factory & filter format_rupiah
+│   ├── routes.py                         # Controller halaman web & REST API
+│   ├── static/
+│   │   ├── css/style.css                 # Stylesheet responsif (360px - 1440px+)
+│   │   └── js/main.js                    # Interaksi form, preset mode & live search
+│   └── templates/
+│       ├── base.html                     # Layout utama, navigasi, footer
+│       ├── index.html                    # Halaman awal & pencari budget
+│       ├── results.html                  # Halaman tiket rekomendasi & defisit
+│       ├── merchants.html                # Direktori kantin + filter live
+│       ├── error.html                    # Halaman error HTTP 400/404/405
+│       └── macros/icons.html             # Sistem ikon SVG kustom
 ├── core/
 │   ├── __init__.py
-│   ├── loader.py                # Parser dan validator dataset merchants.json
-│   └── budget.py                # Algoritma 0/1 knapsack DP & combo optimizer
+│   ├── loader.py                         # Validator & pemuat dataset JSON
+│   ├── models.py                         # Model data aplikasi
+│   └── budget.py                         # Algoritma 0/1 Knapsack DP & optimizer
 ├── data/
-│   └── merchants.json           # Dataset survei menu kantin se-UI
-├── app/
-│   ├── __init__.py              # Flask app factory
-│   ├── routes.py                # Route controller dan endpoint API
-│   ├── templates/
-│   │   ├── base.html            # Template induk Jinja2
-│   │   ├── index.html           # Halaman utama & form input budget
-│   │   ├── results.html         # Halaman hasil rekomendasi hidangan
-│   │   ├── merchants.html       # Katalog direktori kantin & stan
-│   │   └── error.html           # Halaman penanganan error ramah pengguna
-│   └── static/
-│       ├── css/
-│       │   └── style.css        # Desain visual UI Yellow & Slate theme
-│       └── js/
-│           └── main.js          # Skrip interaktivitas klien
+│   └── merchants.json                    # Dataset 6 kantin UI (10 stan, 41 menu)
 ├── docs/
-│   └── PR_REVIEWS.md            # Dokumentasi catatan simulasi Pull Request tim
-└── tests/
-    ├── __init__.py
-    ├── conftest.py              # Fixture pytest terpusat
-    ├── test_loader.py           # Unit test pemuatan & validasi data
-    ├── test_budget.py           # Unit test algoritma budget & knapsack
-    ├── test_app.py              # Integrasi test route Flask
-    └── e2e/                     # Suite pengujian komprehensif end-to-end
+│   ├── ARCHITECTURE_AND_WORKFLOW.md      # Rancangan workflow & arsitektur tim
+│   └── PR_REVIEWS.md                     # Catatan tinjauan Pull Request tim
+├── tests/                                # Pytest unit, web route & 4-tier E2E
+├── DESIGN.md                             # Dokumentasi arah desain UI/UX
+├── README.md                             # Dokumentasi utama proyek
+├── requirements.txt                      # Daftar dependensi Python
+├── run.py                                # Titik masuk server Flask lokal
+└── start.bat                             # Skrip peluncur cepat Windows
 ```
 
 ---
 
-## 🚀 Panduan Instalasi & Menjalankan Aplikasi
+## Cara Menjalankan Aplikasi Secara Lokal
 
-### 1. Prasyarat Sistem
-- Python 3.10 atau versi yang lebih baru
+### 1. Prasyarat
+- Python 3.10 atau lebih baru
 - Git
-- Pip (Python package manager)
 
-### 2. Kloning Repositori & Persiapan Environment
+### 2. Persiapan Lingkungan & Instalasi
 ```bash
-# Kloning repositori proyek
 git clone https://github.com/BhreKheley/TPA-DDP1.git
 cd TPA-DDP1
 
-# Buat virtual environment
 python -m venv .venv
-
-# Aktifkan virtual environment
-# Pada Windows (PowerShell):
+# Windows PowerShell:
 .venv\Scripts\Activate.ps1
-# Pada Windows (Command Prompt):
-.venv\Scripts\activate.bat
-# Pada Linux / macOS:
+# Linux / macOS:
 source .venv/bin/activate
-```
 
-### 3. Instalasi Dependensi
-```bash
-pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Menjalankan Server Web Lokal
+### 3. Menjalankan Server Web
 ```bash
 python run.py
 ```
-Aplikasi akan aktif dan dapat diakses melalui browser pada alamat:
-`http://127.0.0.1:5000`
+Atau klik dua kali `start.bat` pada Windows. Buka `http://127.0.0.1:5000` di peramban.
 
-### 5. Menjalankan Pengujian Otomatis (*Unit & E2E Tests*)
+### 4. Menjalankan Pengujian & Linting
 ```bash
-# Menjalankan seluruh pengujian unit
 pytest -v
-
-# Menjalankan pengujian dengan laporan cakupan kode (coverage)
-pytest --cov=core --cov=app tests/
-
-# Menjalankan pengujian E2E terintegrasi
-pytest tests/e2e/ -v
-```
-
-### 6. Menjalankan Pengecekan Kualitas Kode (*Linting*)
-```bash
+python tests/e2e/run_e2e.py
 flake8 core app tests --max-line-length=120
 ```
 
 ---
 
-## 🍽️ Cakupan Kantin Universitas Indonesia
-Dataset hidangan mencakup merchant dan stan di 6 kantin utama kampus UI:
-1. **Kantin Dallas** (Fakultas Ilmu Pengetahuan Budaya - FIB)
-2. **Kantin Takor / Taman Korea** (Fakultas Ekonomi dan Bisnis - FEB)
-3. **Kantin Kansas / Kantin Sastra** (FIB)
-4. **Kantin Pusgiwa** (Pusat Kegiatan Mahasiswa UI)
-5. **Kantin Texas** (Fakultas Teknik - FT)
-6. **Kantin Fasilkom** (Fakultas Ilmu Komputer)
+## Tautan Video Presentasi
+- Video Demo (Maksimal 15 Menit): `https://youtu.be/placeholder` (diperbarui setelah perekaman selesai)
 
 ---
 
-## 🎥 Tautan Video Demo & Presentasi
-- **YouTube Link:** `[Tautan Video Demo YouTube - Maksimal 15 Menit](https://youtu.be/placeholder)` *(Akan diperbarui setelah proses perekaman video demo)*
-
----
-
-## 🤖 Catatan Penggunaan Kecerdasan Buatan (AI Usage Disclosure)
-Sesuai dengan ketentuan panduan proyek DDP1 Gasal 2026/2027, proyek ini memanfaatkan kecerdasan buatan (AI) sebagai asisten pengembangan dalam perancangan kerangka pengujian awal (*scaffolding test cases*), penataan template dasar Flask, dan dokumentasi. Seluruh logika inti (termasuk algoritma *Dynamic Programming 0/1 Knapsack*, struktur validasi data, dan integrasi rute web) telah dipelajari, dipahami, dan dapat dijelaskan secara mendalam oleh setiap anggota tim (Bhre, Naisya, dan Johannes) baik untuk modul miliknya sendiri maupun modul anggota lain tanpa membaca teks kode.
-
----
-
-## 📄 Lisensi
-Proyek ini dikembangkan untuk tujuan akademis sebagai Tugas Pemrograman Akhir mata kuliah Dasar-Dasar Pemrograman 1, Fakultas Ilmu Komputer, Universitas Indonesia.
+## Catatan Transparansi Penggunaan AI
+Sesuai panduan Tugas Pemrograman Akhir DDP1 Gasal 2026/2027, kecerdasan buatan (AI) digunakan sebagai alat bantu penulisan kerangka pengujian awal dan penataan tata letak HTML/CSS. Seluruh algoritma inti (*0/1 Knapsack Dynamic Programming*, validasi skema, serta alur logika web) telah dipahami dan dikuasai oleh setiap anggota Kelompok 5 (Bhre, Naisya, Johannes).

@@ -20,12 +20,12 @@ Dokumen ini mencatat proses peer review dan penggabungan cabang fitur (*feature 
 
 ### 1. Ringkasan Perubahan
 - Menambahkan dataset survei `data/merchants.json` yang mencakup 10 stan makanan di 6 kantin kampus UI:
-  1. Kantin Dallas (RIK UI)
-  2. Kantin Pusgiwa (Pusat Kegiatan Mahasiswa UI)
-  3. Kantin Takor (Taman Korea, FEB UI)
-  4. Kantin Kansas (Kantin Sastra, FIB UI)
-  5. Kantin Texas (Fakultas Teknik UI)
-  6. Kantin Fasilkom (Fakultas Ilmu Komputer UI)
+  1. Dallas (Di Bawah Lindungan Allah SWT, FMIPA UI)
+  2. Pusgiwa (Pusat Kegiatan Mahasiswa UI)
+  3. Takor (Taman Korea, FISIP UI)
+  4. Kansas (Kantin Sastra, FIB UI)
+  5. Kantek (Kantin Teknik, FT UI)
+  6. Balgebun (Kantin Fasilkom UI)
 - Total 41 menu makanan, minuman, dan camilan dengan rentang harga Rp 2.000 hingga Rp 25.000.
 - Mengimplementasikan modul pemuat data di `core/loader.py`:
   - `Category` enum (`FOOD`, `BEVERAGE`, `SNACK`).
@@ -40,8 +40,8 @@ Dokumen ini mencatat proses peer review dan penggabungan cabang fitur (*feature 
 
 | Butir Evaluasi | Kriteria | Hasil Uji | Status |
 |---|---|---|---|
-| Keterwakilan Kantin | Minimal 6 kantin kampus UI | Terisi Dallas, Pusgiwa, Takor, Kansas, Texas, Fasilkom | PASS |
-| Batas Harga | Rentang harga mahasiswa (Rp 2.000 - Rp 25.000) | Termurah Rp 2.000 (Es Teh Tawar), termahal Rp 25.000 (Nasi Salmon) | PASS |
+| Keterwakilan Kantin | Minimal 6 kantin kampus UI | Terisi Dallas (FMIPA), Pusgiwa, Takor (FISIP), Kansas (FIB), Kantek (FT), Balgebun (Fasilkom) | PASS |
+| Batas Harga | Rentang harga mahasiswa (Rp 2.000 - Rp 25.000) | Termurah Rp 2.000 (Es Teh Tawar), termahal Rp 25.000 (Ikan Dori Teriyaki) | PASS |
 | Validasi Kategori | Hanya `"food"`, `"beverage"`, `"snack"` | Divalidasi via `Category` enum | PASS |
 | Tag Diet | Normalisasi huruf kecil (`halal`, `vegetarian`) | Disimpan dalam `frozenset` huruf kecil | PASS |
 | Immutabilitas | `MenuItem` tidak bisa diubah pasca inisialisasi | Terbukti melempar FrozenInstanceError saat dites mutasi | PASS |
@@ -49,7 +49,7 @@ Dokumen ini mencatat proses peer review dan penggabungan cabang fitur (*feature 
 | Unit Test | Seluruh uji pada modul pemuat data berhasil | 11 test di `tests/test_loader.py` lolos 100% | PASS |
 
 ### 3. Komentar Reviewer (Bhre Nabil Faeyza)
-> *"Udah gue review ya Nis dataset kantinnya. Data 6 kantin kampus (Dallas, Takor, Kansas, Pusgiwa, Texas, Fasilkom) udah masuk semua dan harganya udah sesuai survei lapangan kemarin, dari es teh tawar 2rb sampe paket nasi salmon 25rb.*
+> *"Udah gue review ya Nis dataset kantinnya. Data 6 kantin kampus (Dallas FMIPA, Takor FISIP, Kansas FIB, Kantek FT, Balgebun Fasilkom, sama Pusgiwa) udah masuk semua dan harganya sesuai kondisi asli di kantin, dari es teh tawar 2rb sampe paket dori teriyaki 25rb.*
 >
 > *Pilihan pake `@dataclass(frozen=True)` di `MenuItem` sama `frozenset` buat dietary tags udah tepat bgt, jadi pas gue olah di knapsack DP nanti objeknya aman dari mutasi data. Unit test di `test_loader.py` juga udah lulus semua. Approved, gue merge ke main ya."*
 
