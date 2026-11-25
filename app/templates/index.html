@@ -4,14 +4,18 @@
 {% block title %}Beranda | Smart Meal Finder UI{% endblock %}
 
 {% block content %}
+<!-- Hero Section Interaktif Kampus UI -->
 <section class="hero-section">
     <div class="hero-header-wrap">
-        <span class="hero-kicker">KANTIN KAMPUS UNIVERSITAS INDONESIA</span>
+        <div class="hero-status-pill">
+            <span class="hero-status-dot" aria-hidden="true"></span>
+            <span>6 KANTIN MAHASISWA &bull; 146 MENU TERDATA &bull; ALGORITMA KNAPSACK DP</span>
+        </div>
         <h1 class="hero-title">
-            Makan Kenyang, Pas di Kantong Kampus <span class="highlight-yellow">Universitas Indonesia</span>
+            Makan Kenyang, Pas di Kantong Mahasiswa <span class="highlight-yellow">Universitas Indonesia</span>
         </h1>
         <p class="hero-desc">
-            Temukan kombinasi makanan dan minuman terbaik di seluruh kantin UI sesuai saldo harianmu menggunakan algoritma Dynamic Programming 0/1 Knapsack.
+            Optimalkan uang makan harianmu di seluruh kantin kampus UI. Sistem menghitung paket kombinasi makanan dan minuman paling pas dan memuaskan sesuai saldo sakumu.
         </p>
     </div>
 </section>
@@ -20,12 +24,12 @@
 <section class="search-section">
     <div class="card search-card">
         <div class="card-header-clean">
-            <div class="card-title-icon">
-                {{ icon("wallet", size=22, class="icon-accent") }}
+            <div class="card-title-icon" aria-hidden="true">
+                {{ icon("wallet", size=24) }}
             </div>
             <div>
                 <h2 class="card-title">Cari Paket Menu Mahasiswa</h2>
-                <p class="card-subtitle">Ketik nominal uang makan untuk mendapatkan rekomendasi kombinasi terjangkau.</p>
+                <p class="card-subtitle">Masukkan uang saku makan untuk menghitung paket kombinasi paling optimal.</p>
             </div>
         </div>
 
@@ -33,28 +37,33 @@
             <!-- Input Nominal Anggaran -->
             <div class="form-group">
                 <label for="budget-input" class="form-label">
-                    <strong>Budget Kamu (Rupiah):</strong>
-                    <span class="currency-preview" id="budget-preview">Rp 0</span>
+                    <span>Nominal Budget Saku (Rupiah):</span>
+                    <span class="currency-preview" id="budget-preview">Rp 10.000</span>
                 </label>
                 <div class="input-prefix-wrapper">
-                    <span class="input-prefix">Rp</span>
+                    <span class="input-prefix" aria-hidden="true">Rp</span>
                     <input 
                         type="number" 
                         name="budget" 
                         id="budget-input" 
                         class="form-control form-control-lg" 
                         placeholder="Contoh: 15000" 
+                        value="10000"
                         min="0" 
                         step="1000" 
                         required
                         autocomplete="off"
+                        aria-describedby="budget-preview"
                     >
                 </div>
             </div>
 
             <!-- Pilihan Cepat (Quick Preset Chips) -->
             <div class="form-group">
-                <label class="form-label text-muted">Pilihan Cepat Nominal Saku Mahasiswa:</label>
+                <label class="form-label">
+                    <span>Pilihan Cepat Uang Saku:</span>
+                    <small class="text-muted" style="font-weight: 500;">Klik nominal untuk isi otomatis</small>
+                </label>
                 <div class="preset-chips">
                     <button type="button" class="preset-chip active" data-amount="10000" data-combo="off">
                         <span class="preset-title">Rp 10.000</span>
@@ -72,13 +81,47 @@
                         <span class="preset-title">Rp 25.000</span>
                         <span class="preset-desc">Paket Puas</span>
                     </button>
+                    <button type="button" class="preset-chip" data-amount="30000" data-combo="on">
+                        <span class="preset-title">Rp 30.000</span>
+                        <span class="preset-desc">Traktir Teman</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Format Pilihan Menu (Fleksibel vs Wajib Kombo) -->
+            <div class="form-group">
+                <label class="form-label">
+                    <span>Format Pilihan Paket:</span>
+                </label>
+                <div class="format-toggle-group">
+                    <label class="format-option">
+                        <input type="radio" name="require_combo" value="off" id="combo-flexible" checked>
+                        <span class="format-box">
+                            <span class="format-icon" aria-hidden="true">{{ icon("wallet", 18) }}</span>
+                            <span class="format-text">
+                                <strong>Semua Pilihan (Fleksibel & Hemat)</strong>
+                                <small>Kombo makanan, camilan nikmat, atau menu kenyang (cocok untuk saldo Rp 10.000 ke atas)</small>
+                            </span>
+                        </span>
+                    </label>
+                    <label class="format-option">
+                        <input type="radio" name="require_combo" value="on" id="combo-strict">
+                        <span class="format-box">
+                            <span class="format-icon" aria-hidden="true">{{ icon("food", 18) }}</span>
+                            <span class="format-text">
+                                <strong>Wajib Kombo Lengkap (1 Makanan + 1 Minuman)</strong>
+                                <small>Memastikan wajib ada 1 makanan berat dan 1 minuman segar (mulai Rp 14.000)</small>
+                            </span>
+                        </span>
+                    </label>
                 </div>
             </div>
 
             <!-- Pilihan Lokasi Kantin UI -->
             <div class="form-group">
                 <label for="canteen-select" class="form-label">
-                    <strong>Pilih Lokasi Kantin UI:</strong>
+                    <span>Filter Lokasi Kantin UI:</span>
+                    <small class="text-muted" style="font-weight: 500;">Opsional</small>
                 </label>
                 <div class="select-wrapper">
                     <select name="canteen" id="canteen-select" class="form-control">
@@ -92,7 +135,10 @@
 
             <!-- Preferensi Makanan -->
             <div class="form-group">
-                <label class="form-label"><strong>Preferensi Menu:</strong></label>
+                <label class="form-label">
+                    <span>Preferensi Menu & Diet:</span>
+                    <small class="text-muted" style="font-weight: 500;">Pilih jika ada pantangan</small>
+                </label>
                 <div class="dietary-checkboxes">
                     {% for opt in dietary_options %}
                     <label class="checkbox-pill">
@@ -103,71 +149,112 @@
                 </div>
             </div>
 
-            <!-- Format Pilihan Menu (Fleksibel vs Wajib Kombo) -->
-            <div class="form-group">
-                <label class="form-label"><strong>Format Pilihan Paket:</strong></label>
-                <div class="format-toggle-group">
-                    <label class="format-option">
-                        <input type="radio" name="require_combo" value="off" id="combo-flexible" checked>
-                        <span class="format-box">
-                            <span class="format-icon">{{ icon("wallet", 18) }}</span>
-                            <span class="format-text">
-                                <strong>Semua Pilihan (Fleksibel & Hemat)</strong>
-                                <small class="text-muted">Kombo makanan, camilan + minuman, atau menu kenyang (cocok untuk budget Rp 10.000 ke atas)</small>
-                            </span>
-                        </span>
-                    </label>
-                    <label class="format-option">
-                        <input type="radio" name="require_combo" value="on" id="combo-strict">
-                        <span class="format-box">
-                            <span class="format-icon">{{ icon("food", 18) }}</span>
-                            <span class="format-text">
-                                <strong>Wajib Kombo Lengkap (1 Makanan + 1 Minuman)</strong>
-                                <small class="text-muted">Memastikan wajib ada 1 makanan berat dan 1 minuman segar (mulai Rp 14.000)</small>
-                            </span>
-                        </span>
-                    </label>
-                </div>
-            </div>
-
             <!-- Tombol Aksi Utama -->
             <div class="form-action">
-                <button type="submit" class="btn btn-primary btn-block btn-lg">
-                    <span class="btn-icon">{{ icon("search", size=18) }}</span>
-                    <span>Cari Rekomendasi Menu</span>
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-search-btn">
+                    <span class="btn-icon" aria-hidden="true">{{ icon("search", size=20) }}</span>
+                    <span>Cari Rekomendasi Menu Sekarang</span>
                 </button>
             </div>
         </form>
     </div>
 </section>
 
-<!-- Direktori Singkat Kantin Kampus UI -->
+<!-- Direktori 6 Kantin Kampus UI -->
 <section class="features-section">
     <div class="section-header">
-        <h2>Direktori Kantin Kampus UI</h2>
-        <p class="text-muted">6 Zona Kuliner Mahasiswa Universitas Indonesia yang Terhubung dalam Smart Meal Finder</p>
+        <h2>Direktori 6 Kantin Kampus UI</h2>
+        <p class="text-muted">Kawasan kuliner mahasiswa Universitas Indonesia yang terintegrasi dalam sistem Smart Meal Finder</p>
     </div>
     <div class="grid-3">
-        <div class="feature-card">
-            <div class="feature-icon">
-                {{ icon("canteen", size=22) }}
+        <div class="canteen-card">
+            <div class="canteen-card-header">
+                <span class="canteen-badge canteen-pill-dallas">Rumpun Ilmu Kesehatan</span>
+                <span class="canteen-price-floor">Mulai Rp 4.000</span>
             </div>
-            <h3>Kantin Dallas & Pusgiwa</h3>
-            <p>Kuliner mahasiswa Rumpun Ilmu Kesehatan (RIK) dan Pusat Kegiatan Mahasiswa dengan menu penyetan dan jus buah.</p>
+            <div>
+                <h3>Kantin Dallas (RIK)</h3>
+                <p>Pusat kuliner mahasiswa Farmasi, Kedokteran, dan FKM. Terkenal dengan hidangan penyetan, ekkado, dan aneka jus buah segar.</p>
+            </div>
+            <div class="canteen-card-signature">
+                {{ icon("food", size=14) }}
+                <span>Menu Favorit: Ayam Penyet & Ekkado</span>
+            </div>
         </div>
-        <div class="feature-card">
-            <div class="feature-icon">
-                {{ icon("canteen", size=22) }}
+
+        <div class="canteen-card">
+            <div class="canteen-card-header">
+                <span class="canteen-badge canteen-pill-takor">Fakultas Teknik</span>
+                <span class="canteen-price-floor">Mulai Rp 4.000</span>
             </div>
-            <h3>Kantin Takor & Kansas</h3>
-            <p>Taman Korea FEB UI dengan masakan bento hemat dan Kantin Sastra FIB UI dengan aneka masakan rumahan.</p>
+            <div>
+                <h3>Kantin Takor (Taman Korea)</h3>
+                <p>Spot favorit mahasiswa Teknik dan FEB. Menyajikan aneka bento hemat mahasiswa, pangsit goreng, dan teh manis hangat segar.</p>
+            </div>
+            <div class="canteen-card-signature">
+                {{ icon("food", size=14) }}
+                <span>Menu Favorit: Chicken Katsu & Pangsit Goreng</span>
+            </div>
         </div>
-        <div class="feature-card">
-            <div class="feature-icon">
-                {{ icon("canteen", size=22) }}
+
+        <div class="canteen-card">
+            <div class="canteen-card-header">
+                <span class="canteen-badge canteen-pill-kansas">Fakultas Ilmu Pengetahuan Budaya</span>
+                <span class="canteen-price-floor">Mulai Rp 4.000</span>
             </div>
-            <h3>Kantin Texas & Fasilkom</h3>
-            <p>Pusat energi Fakultas Teknik dan Fasilkom UI yang menyajikan mie ayam, ayam geprek krispi, dan hidangan cepat saji.</p>
+            <div>
+                <h3>Kantin Kansas (Sastra)</h3>
+                <p>Kantin asri mahasiswa FIB. Menawarkan masakan rumahan lezat, soto ayam kuah gurih, dan es teh lemon harga ramah kantong.</p>
+            </div>
+            <div class="canteen-card-signature">
+                {{ icon("food", size=14) }}
+                <span>Menu Favorit: Soto Ayam Lamongan & Es Jeruk</span>
+            </div>
+        </div>
+
+        <div class="canteen-card">
+            <div class="canteen-card-header">
+                <span class="canteen-badge canteen-pill-pusgiwa">Pusat Kegiatan Mahasiswa</span>
+                <span class="canteen-price-floor">Mulai Rp 3.000</span>
+            </div>
+            <div>
+                <h3>Kantin Pusgiwa UI</h3>
+                <p>Pusat energi para aktivis organisasi kampus UI. Terkenal dengan camilan bakwan mendoan, tahu crispy, dan aneka kopi dingin.</p>
+            </div>
+            <div class="canteen-card-signature">
+                {{ icon("food", size=14) }}
+                <span>Menu Favorit: Bakwan Mendoan & Teh Botol</span>
+            </div>
+        </div>
+
+        <div class="canteen-card">
+            <div class="canteen-card-header">
+                <span class="canteen-badge canteen-pill-texas">FMIPA</span>
+                <span class="canteen-price-floor">Mulai Rp 4.000</span>
+            </div>
+            <div>
+                <h3>Kantin Texas (MIPA)</h3>
+                <p>Kantin mahasiswa sains FMIPA dengan pilihan nasi sayur lodeh hemat, pecel lele renyah, dan minuman segar penambah fokus belajar.</p>
+            </div>
+            <div class="canteen-card-signature">
+                {{ icon("food", size=14) }}
+                <span>Menu Favorit: Nasi Sayur Lodeh & Es Teh</span>
+            </div>
+        </div>
+
+        <div class="canteen-card">
+            <div class="canteen-card-header">
+                <span class="canteen-badge canteen-pill-fasilkom">Ilmu Komputer</span>
+                <span class="canteen-price-floor">Mulai Rp 4.000</span>
+            </div>
+            <div>
+                <h3>Kantin Baru Fasilkom</h3>
+                <p>Kantin modern mahasiswa Fasilkom UI. Menyajikan mie ayam baso, nasi telur balado, dan aneka snack pengganjal lapar koding.</p>
+            </div>
+            <div class="canteen-card-signature">
+                {{ icon("food", size=14) }}
+                <span>Menu Favorit: Mie Ayam Pangsit & Kopi Dingin</span>
+            </div>
         </div>
     </div>
 </section>

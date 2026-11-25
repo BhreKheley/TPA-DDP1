@@ -4,14 +4,24 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-    // 1. Mobile Navigation Toggle
+    // 1. Mobile Navigation Toggle & Auto-Close
     var navToggle = document.getElementById('nav-toggle');
     var navMenu = document.getElementById('nav-menu');
 
     if (navToggle && navMenu) {
         navToggle.addEventListener('click', function () {
-            navMenu.classList.toggle('open');
+            var isOpen = navMenu.classList.toggle('open');
             navToggle.classList.toggle('active');
+            navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        // Close menu when clicking outside or clicking any nav link
+        document.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('click', function () {
+                navMenu.classList.remove('open');
+                navToggle.classList.remove('active');
+                navToggle.setAttribute('aria-expanded', 'false');
+            });
         });
     }
 
@@ -76,4 +86,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // 4. Form Submit Instant Feedback
+    var searchForm = document.getElementById('recommend-form');
+    var submitBtn = document.getElementById('submit-search-btn');
+    if (searchForm && submitBtn) {
+        searchForm.addEventListener('submit', function () {
+            submitBtn.style.opacity = '0.85';
+            submitBtn.innerHTML = '<span>Menghitung Rekomendasi Menu...</span>';
+        });
+    }
 });
