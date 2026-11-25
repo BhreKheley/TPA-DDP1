@@ -346,7 +346,13 @@ def filter_items(
                 continue
         if norm_tags:
             item_tags = {t.lower() for t in item.dietary_tags}
-            if not norm_tags.issubset(item_tags):
+            # Allow seamless equivalence between 'pedas' and 'spicy' across UI/dataset labels
+            expanded_item_tags = set(item_tags)
+            if "spicy" in item_tags:
+                expanded_item_tags.add("pedas")
+            if "pedas" in item_tags:
+                expanded_item_tags.add("spicy")
+            if not norm_tags.issubset(expanded_item_tags):
                 continue
         filtered.append(item)
     return filtered

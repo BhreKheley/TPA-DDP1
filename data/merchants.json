@@ -1,12 +1,12 @@
 [
   {
     "id": "m_dallas_01",
-    "name": "Ayam Penyet Mas Brow Dallas",
+    "name": "Warung Penyetan Mas Brow",
     "canteen_id": "dallas",
     "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
     "faculty": "FMIPA UI",
     "rating": 4.7,
-    "description": "Spesialis ayam penyet sambal bawang pedas gurih khas RIK dengan lalapan segar dan nasi pulen hangat.",
+    "description": "Stan penyetan favorit mahasiswa MIPA di lantai bawah musala. Sambal bawangnya pedas segar dengan porsi nasi hangat.",
     "items": [
       {
         "id": "dallas_food_01",
@@ -14,15 +14,10 @@
         "category": "food",
         "price": 16000,
         "satisfaction_score": 89.0,
-        "dietary_tags": [
-          "halal",
-          "spicy"
-        ],
+        "dietary_tags": ["halal", "spicy"],
         "calories": 580,
-        "description": "Nasi hangat dengan ayam goreng crispy dipenyet sambal bawang rawit merah pedas nampol.",
-        "is_available": true,
-        "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
-        "faculty": "FMIPA UI"
+        "description": "Nasi hangat dengan ayam goreng crispy dipenyet sambal bawang rawit merah dan lalapan.",
+        "is_available": true
       },
       {
         "id": "dallas_food_02",
@@ -30,16 +25,10 @@
         "category": "food",
         "price": 11000,
         "satisfaction_score": 81.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 440,
-        "description": "Paket sarapan hemat mahasiswa: nasi hangat, telur dadar daun bawang, dan tempe orek manis gurih.",
-        "is_available": true,
-        "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
-        "faculty": "FMIPA UI"
+        "description": "Paket hemat anak kos: nasi putih, telur dadar daun bawang, dan tempe orek manis gurih.",
+        "is_available": true
       },
       {
         "id": "dallas_bev_01",
@@ -47,16 +36,10 @@
         "category": "beverage",
         "price": 3000,
         "satisfaction_score": 78.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 120,
-        "description": "Es teh manis melati segar porsi jumbo pelepas dahaga setelah praktikum laboratorium.",
-        "is_available": true,
-        "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
-        "faculty": "FMIPA UI"
+        "description": "Es teh manis melati gelas besar pelepas dahaga habis kelas siang di MIPA.",
+        "is_available": true
       },
       {
         "id": "dallas_snack_01",
@@ -64,27 +47,21 @@
         "category": "snack",
         "price": 4000,
         "satisfaction_score": 75.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 210,
-        "description": "Tahu pong goreng tepung renyah disajikan dengan cabai rawit hijau segar.",
-        "is_available": true,
-        "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
-        "faculty": "FMIPA UI"
+        "description": "Tahu pong goreng tepung renyah disajikan dengan cabai rawit hijau.",
+        "is_available": true
       }
     ]
   },
   {
     "id": "m_dallas_02",
-    "name": "Kantin Sehat RIK Juice & Fruit",
+    "name": "Kios Jus & Sarapan Bu Yanti",
     "canteen_id": "dallas",
     "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
     "faculty": "FMIPA UI",
     "rating": 4.8,
-    "description": "Aneka jus buah murni tanpa pemanis buatan dan cemilan sehat favorit mahasiswa rumpun kesehatan.",
+    "description": "Stan jus buah segar, roti panggang, dan camilan pagi untuk sarapan mahasiswa sebelum kuliah jam 8.",
     "items": [
       {
         "id": "dallas_bev_02",
@@ -92,33 +69,21 @@
         "category": "beverage",
         "price": 8000,
         "satisfaction_score": 87.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 160,
-        "description": "Jus mangga manalagi kental dingin tanpa pengawet dengan manis alami.",
-        "is_available": true,
-        "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
-        "faculty": "FMIPA UI"
+        "description": "Jus mangga manalagi kental dingin dengan manis alami buah matang.",
+        "is_available": true
       },
       {
         "id": "dallas_bev_03",
-        "name": "Infused Water Lemon & Mint",
+        "name": "Es Jeruk Nipis Madu",
         "category": "beverage",
         "price": 4000,
         "satisfaction_score": 74.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
-        "calories": 15,
-        "description": "Air mineral dingin detoks dengan irisan lemon California dan daun mint segar.",
-        "is_available": true,
-        "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
-        "faculty": "FMIPA UI"
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
+        "calories": 45,
+        "description": "Perasan jeruk nipis segar dingin dengan campuran madu ringan.",
+        "is_available": true
       },
       {
         "id": "dallas_snack_02",
@@ -126,44 +91,32 @@
         "category": "snack",
         "price": 12000,
         "satisfaction_score": 86.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 190,
-        "description": "Potongan apel, melon, semangka, dan nata de coco berbalut yogurt creamy keju parut.",
-        "is_available": true,
-        "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
-        "faculty": "FMIPA UI"
+        "description": "Potongan apel, melon, semangka, dan nata de coco berbalut saus yogurt dan keju parut.",
+        "is_available": true
       },
       {
         "id": "dallas_food_03",
-        "name": "Roti Gandum Panggang Telur Rebus",
+        "name": "Roti Bakar Telur & Keju",
         "category": "food",
         "price": 13000,
         "satisfaction_score": 83.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 310,
-        "description": "Dua tangkup roti gandum bakar isi telur rebus iris, selada, tomat, dan saus mayo rendah kalori.",
-        "is_available": true,
-        "canteen_name": "Dallas (Di Bawah Lindungan Allah SWT)",
-        "faculty": "FMIPA UI"
+        "description": "Dua tangkup roti panggang mentega isi telur dadar, selada, tomat, dan keju slice.",
+        "is_available": true
       }
     ]
   },
   {
     "id": "m_pusgiwa_01",
-    "name": "Nasi Padang Minang Sakato Pusgiwa",
+    "name": "Nasi Padang Minang Sakato",
     "canteen_id": "pusgiwa",
     "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
     "faculty": "Pusgiwa UI",
     "rating": 4.8,
-    "description": "Masakan Padang legendaris porsi kenyang anak organisasi mahasiswa UI dengan rempah otentik Minang.",
+    "description": "Masakan Padang andalan anak organisasi dan UKM UI di Pusgiwa dengan kuah gulai pekat dan porsi mengenyangkan.",
     "items": [
       {
         "id": "pusgiwa_food_01",
@@ -171,15 +124,10 @@
         "category": "food",
         "price": 22000,
         "satisfaction_score": 95.0,
-        "dietary_tags": [
-          "halal",
-          "spicy"
-        ],
+        "dietary_tags": ["halal", "spicy"],
         "calories": 720,
-        "description": "Nasi Padang porsi kuli dengan rendang sapi empuk, gulai nangka kapau, dan sambal ijo khas Minang.",
-        "is_available": true,
-        "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
-        "faculty": "Pusgiwa UI"
+        "description": "Nasi Padang porsi penuh dengan rendang daging empuk, gulai nangka, daun singkong, dan sambal ijo.",
+        "is_available": true
       },
       {
         "id": "pusgiwa_food_02",
@@ -187,15 +135,10 @@
         "category": "food",
         "price": 17000,
         "satisfaction_score": 90.0,
-        "dietary_tags": [
-          "halal",
-          "spicy"
-        ],
+        "dietary_tags": ["halal", "spicy"],
         "calories": 630,
-        "description": "Nasi putih siram kuah gulai kental dengan sepotong ayam gulai empuk dan rebusan daun singkong.",
-        "is_available": true,
-        "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
-        "faculty": "Pusgiwa UI"
+        "description": "Nasi putih siram kuah gulai kental dengan ayam gulai dan rebusan daun singkong.",
+        "is_available": true
       },
       {
         "id": "pusgiwa_food_03",
@@ -203,16 +146,10 @@
         "category": "food",
         "price": 12000,
         "satisfaction_score": 84.0,
-        "dietary_tags": [
-          "halal",
-          "spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "spicy", "vegetarian"],
         "calories": 490,
-        "description": "Paket hemat kenyang: nasi porsi penuh dengan 2 butir telur balado cabe merah berminyak sedap.",
-        "is_available": true,
-        "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
-        "faculty": "Pusgiwa UI"
+        "description": "Paket hemat anak UKM: nasi porsi kenyang dengan 2 butir telur balado cabe merah.",
+        "is_available": true
       },
       {
         "id": "pusgiwa_bev_01",
@@ -220,16 +157,10 @@
         "category": "beverage",
         "price": 2000,
         "satisfaction_score": 70.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 0,
-        "description": "Segelas es teh tawar dingin pekat penetral santan dan sambal padang.",
-        "is_available": true,
-        "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
-        "faculty": "Pusgiwa UI"
+        "description": "Segelas es teh tawar dingin penetral rasa santan dan sambal Padang.",
+        "is_available": true
       },
       {
         "id": "pusgiwa_snack_01",
@@ -237,60 +168,43 @@
         "category": "snack",
         "price": 5000,
         "satisfaction_score": 80.0,
-        "dietary_tags": [
-          "halal",
-          "spicy"
-        ],
+        "dietary_tags": ["halal", "spicy"],
         "calories": 180,
-        "description": "Kerupuk kulit sapi jangek gurih renyah disiram sesendok kuah gulai hangat pedas.",
-        "is_available": true,
-        "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
-        "faculty": "Pusgiwa UI"
+        "description": "Kerupuk kulit jangek renyah disiram kuah gulai hangat.",
+        "is_available": true
       }
     ]
   },
   {
     "id": "m_pusgiwa_02",
-    "name": "Kedai Toast & Kopi Pusgiwa",
+    "name": "Warung Kopi & Roti Bakar Pusgiwa",
     "canteen_id": "pusgiwa",
     "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
     "faculty": "Pusgiwa UI",
     "rating": 4.5,
-    "description": "Tempat nongkrong santai saat koordinasi kegiatan UKM menyajikan kopi seduh dan roti bakar hangat.",
+    "description": "Tempat kumpul santai saat rapat kegiatan mahasiswa UI dengan menu kopi susu, Indomie, dan roti bakar.",
     "items": [
       {
         "id": "pusgiwa_snack_02",
-        "name": "Roti Bakar Cokelat Keju Melted",
+        "name": "Roti Bakar Cokelat Keju",
         "category": "snack",
         "price": 10000,
         "satisfaction_score": 85.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 360,
-        "description": "Roti tawar tebal dibakar mentega gurih berisi taburan meses cokelat dan keju cheddar melimpah.",
-        "is_available": true,
-        "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
-        "faculty": "Pusgiwa UI"
+        "description": "Roti tawar tebal dibakar mentega berisi meses cokelat dan parutan keju cheddar.",
+        "is_available": true
       },
       {
         "id": "pusgiwa_bev_02",
-        "name": "Kopi Susu Gula Aren Mahasiswa",
+        "name": "Es Kopi Susu Gula Aren",
         "category": "beverage",
         "price": 8000,
         "satisfaction_score": 88.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 180,
-        "description": "Es espresso blend robusta nusantara dipadukan susu kental manis dan sirup gula aren murni.",
-        "is_available": true,
-        "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
-        "faculty": "Pusgiwa UI"
+        "description": "Kopi susu dingin manis gula aren teman lembur rapat kepanitiaan.",
+        "is_available": true
       },
       {
         "id": "pusgiwa_food_04",
@@ -298,26 +212,21 @@
         "category": "food",
         "price": 15000,
         "satisfaction_score": 88.0,
-        "dietary_tags": [
-          "halal",
-          "spicy"
-        ],
+        "dietary_tags": ["halal", "spicy"],
         "calories": 590,
-        "description": "Indomie goreng porsi dobel dengan tumisan kornet sapi, telur ceplok setengah matang, dan sawi hijau.",
-        "is_available": true,
-        "canteen_name": "Pusgiwa (Pusat Kegiatan Mahasiswa)",
-        "faculty": "Pusgiwa UI"
+        "description": "Indomie goreng porsi dobel lengkap dengan tumisan kornet, telur ceplok, dan sawi.",
+        "is_available": true
       }
     ]
   },
   {
     "id": "m_takor_01",
-    "name": "Bento Ekonomis Takor FEB",
+    "name": "Kedai Bento Takor",
     "canteen_id": "takor",
     "canteen_name": "Takor (Taman Korea)",
     "faculty": "FISIP UI",
     "rating": 4.6,
-    "description": "Menu bento hemat cepat saji dengan cita rasa lezat bergaya Jepang favorit mahasiswa FEB UI.",
+    "description": "Stan bento cepat saji di area Taman Korea FISIP UI (eks-Balsem) yang ramai saat jam makan siang.",
     "items": [
       {
         "id": "takor_food_01",
@@ -325,15 +234,10 @@
         "category": "food",
         "price": 18000,
         "satisfaction_score": 91.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy"
-        ],
+        "dietary_tags": ["halal", "non-spicy"],
         "calories": 610,
-        "description": "Fillet dada ayam goreng panir renyah disiram saus teriyaki manis gurih dan salad kol segar.",
-        "is_available": true,
-        "canteen_name": "Takor (Taman Korea)",
-        "faculty": "FISIP UI"
+        "description": "Dada ayam goreng tepung roti renyah disiram saus teriyaki manis gurih dan salad kol.",
+        "is_available": true
       },
       {
         "id": "takor_food_02",
@@ -341,15 +245,10 @@
         "category": "food",
         "price": 12000,
         "satisfaction_score": 85.0,
-        "dietary_tags": [
-          "halal",
-          "spicy"
-        ],
+        "dietary_tags": ["halal", "spicy"],
         "calories": 480,
-        "description": "Nasi bento dengan telur ceplok renyah crispy disiram kecap bumbu bawang dan cabai rawit.",
-        "is_available": true,
-        "canteen_name": "Takor (Taman Korea)",
-        "faculty": "FISIP UI"
+        "description": "Nasi bento dengan telur ceplok renyah disiram kecap bawang gurih dan cabai rawit.",
+        "is_available": true
       },
       {
         "id": "takor_bev_01",
@@ -357,16 +256,10 @@
         "category": "beverage",
         "price": 4000,
         "satisfaction_score": 82.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 110,
-        "description": "Jeruk peras murni manis segar kaya vitamin C disajikan dingin dengan es batu kristal.",
-        "is_available": true,
-        "canteen_name": "Takor (Taman Korea)",
-        "faculty": "FISIP UI"
+        "description": "Jeruk peras segar disajikan dingin dengan es batu.",
+        "is_available": true
       },
       {
         "id": "takor_snack_01",
@@ -374,42 +267,32 @@
         "category": "snack",
         "price": 7000,
         "satisfaction_score": 79.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy"
-        ],
+        "dietary_tags": ["halal", "non-spicy"],
         "calories": 220,
-        "description": "Olahan daging ayam giling berbalut kembang tahu renyah berisi telur puyuh utuh.",
-        "is_available": true,
-        "canteen_name": "Takor (Taman Korea)",
-        "faculty": "FISIP UI"
+        "description": "Olahan ayam giling balut kulit kembang tahu isi telur puyuh.",
+        "is_available": true
       }
     ]
   },
   {
     "id": "m_takor_02",
-    "name": "Bakso & Mie Ayam Takor",
+    "name": "Bakso & Mie Ayam Pak De Takor",
     "canteen_id": "takor",
     "canteen_name": "Takor (Taman Korea)",
     "faculty": "FISIP UI",
     "rating": 4.7,
-    "description": "Mie ayam kenyal home-made dengan kuah kaldu sapi bening gurih dan bakso urat legendaris.",
+    "description": "Mie ayam rumahan dan bakso urat kuah hangat langganan mahasiswa FISIP di Taman Korea.",
     "items": [
       {
         "id": "takor_food_03",
-        "name": "Mie Ayam Jamur Spesial Pangsit",
+        "name": "Mie Ayam Jamur Pangsit",
         "category": "food",
         "price": 15000,
         "satisfaction_score": 89.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy"
-        ],
+        "dietary_tags": ["halal", "non-spicy"],
         "calories": 520,
-        "description": "Mie kenyal berbumbu gurih dengan topping ayam kecap manis jamur kancing dan pangsit goreng renyah.",
-        "is_available": true,
-        "canteen_name": "Takor (Taman Korea)",
-        "faculty": "FISIP UI"
+        "description": "Mie kenyal dengan topping ayam kecap jamur dan pangsit goreng renyah.",
+        "is_available": true
       },
       {
         "id": "takor_food_04",
@@ -417,15 +300,10 @@
         "category": "food",
         "price": 14000,
         "satisfaction_score": 87.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy"
-        ],
+        "dietary_tags": ["halal", "non-spicy"],
         "calories": 410,
-        "description": "Semangkuk bakso urat sapi asli kenyal berserat dengan kuah kaldu sapi segar dan bihun sayur.",
-        "is_available": true,
-        "canteen_name": "Takor (Taman Korea)",
-        "faculty": "FISIP UI"
+        "description": "Bakso urat sapi dengan kuah kaldu gurih, bihun, dan sayuran.",
+        "is_available": true
       },
       {
         "id": "takor_bev_02",
@@ -433,27 +311,21 @@
         "category": "beverage",
         "price": 3000,
         "satisfaction_score": 70.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 0,
-        "description": "Air mineral pegunungan botol 600ml steril dan segar bersuhu dingin.",
-        "is_available": true,
-        "canteen_name": "Takor (Taman Korea)",
-        "faculty": "FISIP UI"
+        "description": "Air mineral botol dingin 600ml.",
+        "is_available": true
       }
     ]
   },
   {
     "id": "m_kansas_01",
-    "name": "Soto Betawi Bu Siti Kansas FIB",
+    "name": "Soto Betawi Bu Siti",
     "canteen_id": "kansas",
     "canteen_name": "Kansas (Kantin Sastra)",
     "faculty": "FIB UI",
     "rating": 4.8,
-    "description": "Soto Betawi santan gurih legendaris FIB yang selalu ramai antre saat jam istirahat kuliah sastra.",
+    "description": "Soto Betawi kuah santan gurih di Kantin Sastra FIB UI dengan bangunan atap kerucut ikonik.",
     "items": [
       {
         "id": "kansas_food_01",
@@ -461,31 +333,21 @@
         "category": "food",
         "price": 20000,
         "satisfaction_score": 93.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy"
-        ],
+        "dietary_tags": ["halal", "non-spicy"],
         "calories": 640,
-        "description": "Soto daging sapi kuah santan gurih kaya rempah pala dan cengkeh lengkap dengan emping dan nasi putih.",
-        "is_available": true,
-        "canteen_name": "Kansas (Kantin Sastra)",
-        "faculty": "FIB UI"
+        "description": "Soto daging sapi kuah santan rempah lengkap dengan emping dan nasi putih.",
+        "is_available": true
       },
       {
         "id": "kansas_food_02",
-        "name": "Soto Ayam Santan Rempah + Nasi",
+        "name": "Soto Ayam Santan + Nasi",
         "category": "food",
         "price": 16000,
         "satisfaction_score": 89.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy"
-        ],
+        "dietary_tags": ["halal", "non-spicy"],
         "calories": 550,
-        "description": "Suwiran ayam kampung dalam kuah soto santan kuning wangi berpadu kentang goreng dan tomat.",
-        "is_available": true,
-        "canteen_name": "Kansas (Kantin Sastra)",
-        "faculty": "FIB UI"
+        "description": "Suwiran ayam dalam kuah soto santan kuning bersama kentang goreng dan tomat.",
+        "is_available": true
       },
       {
         "id": "kansas_bev_01",
@@ -493,27 +355,21 @@
         "category": "beverage",
         "price": 4000,
         "satisfaction_score": 81.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 130,
-        "description": "Seduhan teh hitam pekat berpadu perasan jeruk lemon asli yang segar menyejukkan.",
-        "is_available": true,
-        "canteen_name": "Kansas (Kantin Sastra)",
-        "faculty": "FIB UI"
+        "description": "Teh hitam dingin dengan perasan jeruk lemon segar.",
+        "is_available": true
       }
     ]
   },
   {
     "id": "m_kansas_02",
-    "name": "Kantin Sastra Snack & Dimsum",
+    "name": "Pojok Dimsum & Gorengan Kansas",
     "canteen_id": "kansas",
     "canteen_name": "Kansas (Kantin Sastra)",
     "faculty": "FIB UI",
     "rating": 4.6,
-    "description": "Aneka dimsum hangat kukus dan cemilan santai di bawah rindangnya pepohonan Kantin Kansas.",
+    "description": "Stan jajanan dimsum kukus, lontong sayur, dan gorengan hangat untuk duduk santai di Kansas.",
     "items": [
       {
         "id": "kansas_snack_01",
@@ -521,15 +377,10 @@
         "category": "snack",
         "price": 13000,
         "satisfaction_score": 88.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy"
-        ],
+        "dietary_tags": ["halal", "non-spicy"],
         "calories": 280,
-        "description": "Dimsum kukus lembut isi cincangan daging ayam juicy disajikan dengan saus cabai asam manis pedas.",
-        "is_available": true,
-        "canteen_name": "Kansas (Kantin Sastra)",
-        "faculty": "FIB UI"
+        "description": "Dimsum kukus isi cincangan daging ayam dengan saus cabai asam manis.",
+        "is_available": true
       },
       {
         "id": "kansas_snack_02",
@@ -537,77 +388,54 @@
         "category": "snack",
         "price": 5000,
         "satisfaction_score": 82.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 260,
-        "description": "Gorengan hangat renyah bakwan sayur wortel toge dan tempe mendoan gurih cocol kecap pedas.",
-        "is_available": true,
-        "canteen_name": "Kansas (Kantin Sastra)",
-        "faculty": "FIB UI"
+        "description": "Gorengan hangat bakwan sayur dan tempe mendoan dengan sambal kecap.",
+        "is_available": true
       },
       {
         "id": "kansas_bev_02",
-        "name": "Susu Kedelai Murni Dingin",
+        "name": "Susu Kedelai Dingin",
         "category": "beverage",
         "price": 5000,
         "satisfaction_score": 80.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 150,
-        "description": "Sari kedelai alami manis segar kaya protein nabati tanpa bahan pengawet.",
-        "is_available": true,
-        "canteen_name": "Kansas (Kantin Sastra)",
-        "faculty": "FIB UI"
+        "description": "Sari kedelai murni manis segar buatan harian.",
+        "is_available": true
       },
       {
         "id": "kansas_food_03",
-        "name": "Lontong Sayur Betawi Kuah Kari",
+        "name": "Lontong Sayur Betawi",
         "category": "food",
         "price": 11000,
         "satisfaction_score": 82.0,
-        "dietary_tags": [
-          "halal",
-          "spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "spicy", "vegetarian"],
         "calories": 430,
-        "description": "Potongan lontong pulen disiram kuah sayur labu siam santan gurih pedas dengan tahu cokelat dan kerupuk.",
-        "is_available": true,
-        "canteen_name": "Kansas (Kantin Sastra)",
-        "faculty": "FIB UI"
+        "description": "Lontong kuah sayur labu siam santan gurih pedas dengan tahu cokelat dan kerupuk.",
+        "is_available": true
       }
     ]
   },
   {
     "id": "m_texas_01",
-    "name": "Ayam Geprek Sambal Korek Teknik Texas",
+    "name": "Ayam Geprek Sambal Korek Kantek",
     "canteen_id": "texas",
     "canteen_name": "Kantek (Kantin Teknik)",
     "faculty": "FT UI",
     "rating": 4.7,
-    "description": "Kuliner pedas pembakar semangat anak Teknik dengan sambal korek bawang pedas level bebas dan porsi melimpah.",
+    "description": "Stan ayam geprek dan masakan porsi besar di Kantin Teknik UI dekat jembatan Teksas.",
     "items": [
       {
         "id": "texas_food_01",
-        "name": "Nasi Ayam Geprek Sambal Korek Super Pedas",
+        "name": "Nasi Ayam Geprek Sambal Korek",
         "category": "food",
         "price": 15000,
         "satisfaction_score": 92.0,
-        "dietary_tags": [
-          "halal",
-          "spicy"
-        ],
+        "dietary_tags": ["halal", "spicy"],
         "calories": 630,
-        "description": "Ayam crispy digeprek hancur bersama puluhan cabe rawit merah disiram minyak panas gurih sedap.",
-        "is_available": true,
-        "canteen_name": "Kantek (Kantin Teknik)",
-        "faculty": "FT UI"
+        "description": "Ayam crispy digeprek sambal korek rawit merah dengan porsi nasi melimpah khas anak Teknik.",
+        "is_available": true
       },
       {
         "id": "texas_food_02",
@@ -615,15 +443,10 @@
         "category": "food",
         "price": 24000,
         "satisfaction_score": 94.0,
-        "dietary_tags": [
-          "halal",
-          "spicy"
-        ],
+        "dietary_tags": ["halal", "spicy"],
         "calories": 710,
-        "description": "Bebek ungkep bumbu rempah goreng renyah dipadukan sambal ijo rawit khas kantin Texas Teknik.",
-        "is_available": true,
-        "canteen_name": "Kantek (Kantin Teknik)",
-        "faculty": "FT UI"
+        "description": "Bebek ungkep goreng renyah dipadukan sambal ijo rawit segar.",
+        "is_available": true
       },
       {
         "id": "texas_bev_01",
@@ -631,16 +454,10 @@
         "category": "beverage",
         "price": 4000,
         "satisfaction_score": 78.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 130,
-        "description": "Teh botol sosro legendaris botol kaca dingin pelega dahaga setelah makan pedas.",
-        "is_available": true,
-        "canteen_name": "Kantek (Kantin Teknik)",
-        "faculty": "FT UI"
+        "description": "Teh botol dingin pereda pedas makanan.",
+        "is_available": true
       },
       {
         "id": "texas_snack_01",
@@ -648,16 +465,10 @@
         "category": "snack",
         "price": 5000,
         "satisfaction_score": 81.0,
-        "dietary_tags": [
-          "halal",
-          "spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "spicy", "vegetarian"],
         "calories": 240,
-        "description": "Potongan dadu tahu goreng super garing dengan cocolan sambal bawang ulek kasar.",
-        "is_available": true,
-        "canteen_name": "Kantek (Kantin Teknik)",
-        "faculty": "FT UI"
+        "description": "Potongan dadu tahu goreng garing dengan cocolan sambal bawang.",
+        "is_available": true
       },
       {
         "id": "texas_food_03",
@@ -665,60 +476,43 @@
         "category": "food",
         "price": 10000,
         "satisfaction_score": 80.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 400,
-        "description": "Nasi putih hangat dengan kuah sayur lodeh gurih berisikan kacang panjang, labu, terong, dan tahu tempe.",
-        "is_available": true,
-        "canteen_name": "Kantek (Kantin Teknik)",
-        "faculty": "FT UI"
+        "description": "Nasi putih hangat dengan sayur lodeh kacang panjang, labu, tahu, dan tempe.",
+        "is_available": true
       }
     ]
   },
   {
     "id": "m_fasilkom_01",
-    "name": "Fasilkom Bistro & Cafe Algoritma",
+    "name": "Warung Mbak Yanti Balgebun",
     "canteen_id": "fasilkom",
-    "canteen_name": "Balgebun (Balik Gedung Bundar)",
+    "canteen_name": "Balgebun (Kantin Fasilkom)",
     "faculty": "Fasilkom UI",
     "rating": 4.9,
-    "description": "Kuliner higienis, bergizi seimbang, dan praktis dengan varian menu vegetarian favorit programmer Fasilkom.",
+    "description": "Warung makan andalan mahasiswa Ilmu Komputer di area Balik Gedung Bundar (Balgebun) Fasilkom UI.",
     "items": [
       {
         "id": "fasilkom_food_01",
-        "name": "Tahu Tempe Bakar Saus Madu Organik",
+        "name": "Nasi Sayur Asem & Tahu Tempe Bacem",
         "category": "food",
         "price": 14000,
         "satisfaction_score": 88.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 390,
-        "description": "Tahu dan tempe kedelai non-GMO dibakar olesan madu hutan alami dan ketumbar wangi dengan lalapan.",
-        "is_available": true,
-        "canteen_name": "Balgebun (Balik Gedung Bundar)",
-        "faculty": "Fasilkom UI"
+        "description": "Menu rumahan seimbang dengan tahu tempe bacem manis gurih dan sayur asem segar.",
+        "is_available": true
       },
       {
         "id": "fasilkom_food_02",
-        "name": "Nasi Ricebowl Katsu Sambal Matah",
+        "name": "Nasi Chicken Katsu Sambal Matah",
         "category": "food",
         "price": 19000,
         "satisfaction_score": 92.0,
-        "dietary_tags": [
-          "halal",
-          "spicy"
-        ],
+        "dietary_tags": ["halal", "spicy"],
         "calories": 580,
-        "description": "Chicken katsu potongan tebal di atas nasi putih pulen bertabur sambal matah khas Bali segar wangi serai.",
-        "is_available": true,
-        "canteen_name": "Balgebun (Balik Gedung Bundar)",
-        "faculty": "Fasilkom UI"
+        "description": "Chicken katsu renyah di atas nasi hangat dengan topping sambal matah iris segar.",
+        "is_available": true
       },
       {
         "id": "fasilkom_bev_01",
@@ -726,66 +520,43 @@
         "category": "beverage",
         "price": 9000,
         "satisfaction_score": 94.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 270,
-        "description": "Daging buah alpukat mentega creamy dikocok lembut bersama es serut dan lelehan gula aren pekat.",
-        "is_available": true,
-        "canteen_name": "Balgebun (Balik Gedung Bundar)",
-        "faculty": "Fasilkom UI"
+        "description": "Alpukat mentega kocok lembut dengan es serut dan sirup gula aren.",
+        "is_available": true
       },
       {
         "id": "fasilkom_snack_01",
-        "name": "Kripik Jamur Crispy Tabur Bumbu",
+        "name": "Jamur Crispy Original",
         "category": "snack",
         "price": 6000,
         "satisfaction_score": 84.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 190,
-        "description": "Jamur tiram segar dibalut tepung berbumbu gurih digoreng renyah garing teman ngoding.",
-        "is_available": true,
-        "canteen_name": "Balgebun (Balik Gedung Bundar)",
-        "faculty": "Fasilkom UI"
+        "description": "Jamur tiram goreng tepung gurih renyah untuk teman belajar di Balgebun.",
+        "is_available": true
       },
       {
         "id": "fasilkom_bev_02",
-        "name": "Matcha Latte Oat Milk Dingin",
+        "name": "Es Green Tea Susu",
         "category": "beverage",
         "price": 11000,
         "satisfaction_score": 86.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy",
-          "vegetarian"
-        ],
+        "dietary_tags": ["halal", "non-spicy", "vegetarian"],
         "calories": 170,
-        "description": "Bubuk matcha murni Uji dipadukan susu oat nabati creamy dingin tanpa gula pasir berlebih.",
-        "is_available": true,
-        "canteen_name": "Balgebun (Balik Gedung Bundar)",
-        "faculty": "Fasilkom UI"
+        "description": "Es teh hijau susu dingin manis seimbang.",
+        "is_available": true
       },
       {
         "id": "fasilkom_food_03",
-        "name": "Nasi Sehat Salmon Teriyaki (Sold Out)",
+        "name": "Nasi Ikan Dori Teriyaki (Habis)",
         "category": "food",
         "price": 25000,
         "satisfaction_score": 93.0,
-        "dietary_tags": [
-          "halal",
-          "non-spicy"
-        ],
+        "dietary_tags": ["halal", "non-spicy"],
         "calories": 510,
-        "description": "Grilled salmon teriyaki dengan brokoli rebus dan wortel di atas nasi merah kaya serat.",
-        "is_available": false,
-        "canteen_name": "Balgebun (Balik Gedung Bundar)",
-        "faculty": "Fasilkom UI"
+        "description": "Fillet ikan dori panggang saus teriyaki dengan tumis brokoli wortel.",
+        "is_available": false
       }
     ]
   }
