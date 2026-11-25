@@ -1,22 +1,23 @@
 {% extends "base.html" %}
 {% from "macros/icons.html" import icon %}
 
-{% block title %}Error {{ code }} - {{ title }}{% endblock %}
+{% block title %}Error {{ code }} | Smart Meal Finder{% endblock %}
 
 {% block content %}
 <section class="error-container">
-    <div class="card error-card">
-        <div class="error-status-badge">
-            <span class="error-code-num">{{ code }}</span>
+    <div class="error-card">
+        <div class="error-status-badge tabular-nums">
+            HTTP {{ code }}
         </div>
         <h1 class="error-heading">{{ title }}</h1>
         <p class="error-detail-text">{{ message }}</p>
 
         <div class="error-action-row">
-            <a href="/" class="btn btn-primary btn-lg" style="background-color: #FFC700; color: #0F172A; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;">
-                {{ icon("arrow-left", 16) }} Kembali ke Beranda
+            <a href="/" class="btn btn-primary">
+                {{ icon("arrow-left", 16) }}
+                <span>Kembali ke Pencarian</span>
             </a>
-            <a href="/merchants" class="btn btn-outline">
+            <a href="/merchants" class="btn btn-outline-slate">
                 Lihat Daftar Kantin
             </a>
         </div>

@@ -3,74 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Smart Meal Finder{% endblock %} | Universitas Indonesia</title>
+    <title>{% block title %}Smart Meal Finder{% endblock %} | Kampus UI Depok</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- UI Yellow Theme Meta -->
-    <meta name="theme-color" content="#FFC700">
-    <meta name="description" content="Aplikasi rekomendasi menu makan mahasiswa Universitas Indonesia berbasis algoritma knapsack dynamic programming.">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="description" content="Perencana menu makan mahasiswa Universitas Indonesia di 6 kantin kampus Depok sesuai anggaran saku harian.">
 </head>
 <body>
-    <!-- Garis Aksen Kuning Makara Universitas Indonesia -->
+    <a href="#main-content" class="skip-link">Langsung ke konten utama</a>
     <div class="top-accent-bar" aria-hidden="true"></div>
 
-    <!-- Navigation Bar -->
     <header class="navbar-wrapper">
         <nav class="navbar container" aria-label="Navigasi Utama">
-            <a href="/" class="nav-brand" aria-label="Smart Meal Finder Beranda">
-                <span class="brand-badge">UI</span>
-                <span class="brand-title">Smart Meal Finder</span>
-                <span class="brand-sub">Universitas Indonesia</span>
+            <a href="/" class="nav-brand">
+                <span class="brand-badge" aria-hidden="true">UI</span>
+                <span class="brand-text-group">
+                    <span class="brand-title">Smart Meal Finder</span>
+                    <span class="brand-sub">Kantin Kampus Depok</span>
+                </span>
             </a>
-            <button class="nav-toggle" id="nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
+
+            <button
+                type="button"
+                class="nav-toggle"
+                id="nav-toggle"
+                aria-label="Buka menu navigasi"
+                aria-expanded="false"
+                aria-controls="nav-menu"
+            >
+                <span class="hamburger-line" aria-hidden="true"></span>
+                <span class="hamburger-line" aria-hidden="true"></span>
+                <span class="hamburger-line" aria-hidden="true"></span>
             </button>
+
             <ul class="nav-menu" id="nav-menu">
-                <li class="nav-item">
-                    <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Cari Rekomendasi</a>
+                <li>
+                    <a href="/" class="nav-link {% if request.path == '/' or request.path == '/recommend' %}active{% endif %}">
+                        Cari Menu
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a href="/merchants" class="nav-link {% if request.path == '/merchants' %}active{% endif %}">Daftar Kantin</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/api/merchants" class="nav-link nav-link-api" target="_blank" rel="noopener">REST API</a>
+                <li>
+                    <a href="/merchants" class="nav-link {% if request.path == '/merchants' %}active{% endif %}">
+                        Direktori Kantin
+                    </a>
                 </li>
             </ul>
         </nav>
     </header>
 
-    <!-- Konten Utama -->
     <main class="main-content container" id="main-content">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer Proyek Kelompok 5 -->
     <footer class="footer-wrapper">
         <div class="container footer-content">
             <div class="footer-brand">
                 <div class="footer-logo">
-                    <span class="brand-badge">UI</span>
+                    <span class="brand-badge" aria-hidden="true">UI</span>
                     <strong>Smart Meal Finder</strong>
                 </div>
                 <p class="footer-tagline">
-                    Aplikasi Rekomendasi Menu Makanan Mahasiswa Universitas Indonesia berbasis Dynamic Programming (0/1 Knapsack).
+                    Tugas Pemrograman Akhir DDP1 Semester Gasal 2026/2027, Fakultas Ilmu Komputer Universitas Indonesia. Perhitungan paket menu menggunakan algoritma 0/1 Knapsack Dynamic Programming.
                 </p>
-                <p class="footer-meta">
-                    Dasar-Dasar Pemrograman 1 (DDP1) : <strong>Kelompok 5</strong>
-                </p>
+                <div class="footer-dev-links">
+                    <span>Endpoint Data:</span>
+                    <a href="/api/merchants" target="_blank" rel="noopener">/api/merchants</a>
+                    <span aria-hidden="true">/</span>
+                    <a href="/api/recommend?budget=15000" target="_blank" rel="noopener">/api/recommend</a>
+                </div>
             </div>
+
             <div class="footer-team">
-                <h4 class="team-heading">Tim Pengembang (Kelompok 5)</h4>
+                <h2 class="team-heading">Tim Pengembang (Kelompok 5)</h2>
                 <ul class="team-list">
-                    <li><strong>Naisya Alikha Putri</strong> (2606888276) : <em>Data & UX Lead</em></li>
-                    <li><strong>Bhre Nabil Faeyza</strong> (2606887563) : <em>Core Logic & Algorithm Lead</em></li>
-                    <li><strong>Johannes Praba Aji</strong> (2606748465) : <em>Web App & CI/CD Lead</em></li>
+                    <li><strong>Bhre Nabil Faeyza</strong> (2606887563) : Core Algorithm & Testing</li>
+                    <li><strong>Naisya Alikha Putri</strong> (2606888276) : Data Kantin & UX Design</li>
+                    <li><strong>Johannes Praba Aji</strong> (2606748465) : Web App & CI/CD</li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom container">
-            <p>&copy; 2026 Universitas Indonesia : DDP1 Kelompok 5. Seluruh Hak Cipta Dilindungi.</p>
+            <p>&copy; 2026 Kelompok 5 DDP1, Fasilkom Universitas Indonesia.</p>
         </div>
     </footer>
 

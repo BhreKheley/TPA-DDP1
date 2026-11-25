@@ -1,74 +1,107 @@
 ﻿{% extends "base.html" %}
 {% from "macros/icons.html" import icon %}
 
-{% block title %}Hasil Rekomendasi | Smart Meal Finder UI{% endblock %}
+{% block title %}Hasil Rekomendasi Menu{% endblock %}
 
 {% block content %}
-<section class="results-header" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
-    <div style="margin-bottom: 1rem;">
-        <a href="/" class="btn btn-sm btn-outline-yellow" style="display: inline-flex; align-items: center; gap: 0.4rem;">
-            {{ icon("arrow-left", size=14) }}
-            <span>Ubah pencarian</span>
+<section class="results-top-bar" aria-label="Navigasi dan penyempurnaan pencarian">
+    <div class="results-breadcrumb">
+        <a href="/" class="back-link">
+            {{ icon("arrow-left", size=15) }}
+            <span>Kembali ke Halaman Awal</span>
         </a>
+        <div class="active-query-pills">
+            <span class="query-summary-pill tabular-nums">Budget: <strong>{{ budget | format_rupiah }}</strong></span>
+            <span class="query-summary-pill">Lokasi: <strong>{{ canteen }}</strong></span>
+            <span class="query-summary-pill">
+                Mode:
+                <strong>
+                    {% if food_only %}Bawa Tumbler
+                    {% elif require_combo %}Kombo Lengkap
+                    {% else %}Fleksibel / Jajan{% endif %}
+                </strong>
+            </span>
+        </div>
     </div>
 
-    <!-- Quick Refine -->
-    <div class="quick-filter-bar">
-        <form action="/recommend" method="POST" class="quick-filter-form">
-            <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 180px;">
-                <span style="font-weight: 700; color: var(--slate-700); font-size: 0.9rem;">Budget:</span>
+    <!-- Form Koreksi Cepat Tanpa Harus Balik ke Beranda -->
+    <form action="/recommend" method="POST" class="quick-refine-card">
+        <div class="refine-inputs-row">
+            <div class="refine-field">
+                <label for="refine-budget">Budget (Rp)</label>
                 <input
                     type="number"
                     name="budget"
-                    class="form-control"
-                    placeholder="Budget (Rp)"
+                    id="refine-budget"
+                    class="form-control tabular-nums"
                     value="{{ budget }}"
                     min="0"
                     step="1000"
                     required
-                    style="height: 44px;"
                 >
             </div>
-            <div style="flex: 1; min-width: 200px;">
-                <select name="canteen" class="form-control" style="height: 44px;">
+
+            <div class="refine-field">
+                <label for="refine-mode">Cara Makan</label>
+                <select name="mode" id="refine-mode" class="form-control">
+                    <option value="combo" {% if active_mode == 'combo' %}selected{% endif %}>Kombo (Makan + Minum)</option>
+                    <option value="tumbler" {% if active_mode == 'tumbler' %}selected{% endif %}>Bawa Tumbler (Makan Saja)</option>
+                    <option value="flexible" {% if active_mode == 'flexible' %}selected{% endif %}>Bebas / Jajan Hemat</option>
+                </select>
+            </div>
+
+            <div class="refine-field">
+                <label for="refine-canteen">Lokasi Kantin</label>
+                <select name="canteen" id="refine-canteen" class="form-control">
                     <option value="">Semua Kantin UI</option>
                     {% for c in canteens %}
-                    <option value="{{ c }}" {% if canteen == c %}selected{% endif %}>{{ c }}</option>
+                    <option value="{{ c }}" {% if selected_canteen_raw == c %}selected{% endif %}>{{ c }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <input type="hidden" name="require_combo" value="{% if require_combo %}on{% else %}off{% endif %}">
-            <input type="hidden" name="food_only" value="{% if food_only %}on{% else %}off{% endif %}">
-            <button type="submit" class="btn btn-primary" style="height: 44px; padding: 0 1.5rem;">
-                Hitung Ulang
-            </button>
-        </form>
-    </div>
+
+            <div class="refine-submit-col">
+                <button type="submit" class="btn btn-primary btn-block">Perbarui Hasil</button>
+            </div>
+        </div>
+
+        <div class="refine-dietary-row">
+            <span class="refine-diet-label">Preferensi:</span>
+            <div class="dietary-checkboxes">
+                {% for opt in dietary_options %}
+                <label class="checkbox-pill checkbox-pill-sm">
+                    <input type="checkbox" name="dietary" value="{{ opt.id }}" {% if opt.id in dietary %}checked{% endif %}>
+                    <span class="pill-label">{{ opt.label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+    </form>
 </section>
 
-{# ── Kasus 1: SUCCESS ───────────────────────────────────────────────────── #}
+<!-- Kasus 1: Rekomendasi Ditemukan -->
 {% if result and result.status == "SUCCESS" %}
-<section class="recommendations-section">
-    <div class="section-title-wrap">
-        <h2>Ini paket yang masuk budgetmu</h2>
-        <p class="text-muted">
-            {% if food_only %}Mode Bawa Tumbler — makanan aja, minuman kamu sendiri.{% endif %}
-            Dihitung pakai Knapsack DP buat memaksimalkan kepuasan dalam budget {{ budget | format_rupiah }}.
-        </p>
+<section class="recommendations-section" aria-labelledby="rec-heading">
+    <div class="section-head-row">
+        <div>
+            <h1 class="page-title" id="rec-heading">Pilihan Paket Sesuai Budget</h1>
+            <p class="text-muted">
+                Diurutkan berdasarkan skor kepuasan tertinggi tanpa melewati anggaran {{ budget | format_rupiah }}.
+            </p>
+        </div>
     </div>
 
     <div class="combinations-grid">
         {% for combo in result.recommendations %}
-        <div class="combo-card {% if combo.package_type == 'optimal' %}combo-optimal{% elif combo.package_type == 'hemat' %}combo-hemat{% endif %}">
-            <!-- Header -->
-            <div class="combo-card-header">
+        <article class="combo-card {% if combo.package_type == 'optimal' %}combo-optimal{% elif combo.package_type == 'hemat' %}combo-hemat{% endif %}">
+            <header class="combo-card-header">
                 <div class="package-tier">
                     {% if combo.package_type == "optimal" %}
-                        <span class="badge badge-optimal">Rekomendasi Utama</span>
+                        <span class="badge badge-optimal">Paling Optimal</span>
                     {% elif combo.package_type == "hemat" %}
                         <span class="badge badge-hemat">Paling Hemat</span>
                     {% else %}
-                        <span class="badge badge-optimal">Paket Pilihan</span>
+                        <span class="badge badge-combo">Alternatif</span>
                     {% endif %}
 
                     {% if combo.is_exact_match %}
@@ -76,48 +109,51 @@
                     {% endif %}
                 </div>
                 <div class="combo-location">
-                    {{ icon("canteen", size=13) }}
+                    {{ icon("location", size=14) }}
                     <span>{{ combo.canteen_names | join(", ") }}</span>
                 </div>
-            </div>
+            </header>
 
-            <!-- Item list -->
             <div class="combo-items-list">
                 {% for item in combo.items %}
                 <div class="combo-item-row">
                     <div class="item-info">
                         <span class="item-category-icon" aria-hidden="true">
                             {% if item.category.value == 'food' or item.category == 'food' %}
-                                {{ icon("food", size=18) }}
+                                {{ icon("food", size=16) }}
                             {% elif item.category.value == 'beverage' or item.category == 'beverage' %}
-                                {{ icon("beverage", size=18) }}
+                                {{ icon("beverage", size=16) }}
                             {% else %}
-                                {{ icon("snack", size=18) }}
+                                {{ icon("snack", size=16) }}
                             {% endif %}
                         </span>
                         <div>
                             <div class="item-name">{{ item.name }}</div>
-                            <div class="item-merchant text-muted">{{ item.merchant_name }} &bull; {{ item.canteen_name }}</div>
+                            <div class="item-merchant">
+                                {{ item.merchant_name }} &bull; {{ item.canteen_name }}
+                                {% if item.calories %}<span class="item-kcal tabular-nums">({{ item.calories }} kkal)</span>{% endif %}
+                            </div>
+                            {% if item.dietary_tags %}
                             <div class="item-tags">
                                 {% for tag in item.dietary_tags %}
                                     <span class="tag-badge-sm">{{ tag }}</span>
                                 {% endfor %}
                             </div>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="item-price">
+                    <div class="item-price tabular-nums">
                         {{ item.price | format_rupiah }}
                     </div>
                 </div>
                 {% endfor %}
             </div>
 
-            <!-- Footer finansial -->
-            <div class="combo-footer">
+            <footer class="combo-footer">
                 <div class="combo-progress">
                     <div class="progress-label">
-                        <span>Penggunaan saldo:</span>
-                        <span>{{ ((combo.total_cost / combo.budget_limit) * 100) | round }}%</span>
+                        <span>Terpakai dari budget</span>
+                        <span class="tabular-nums">{{ ((combo.total_cost / combo.budget_limit) * 100) | round | int }}%</span>
                     </div>
                     <div class="progress-bar-bg" aria-hidden="true">
                         <div class="progress-bar-fill" style="width: {{ ((combo.total_cost / combo.budget_limit) * 100) | round }}%;"></div>
@@ -126,91 +162,87 @@
 
                 <div class="financial-summary">
                     <div class="fin-col">
-                        <span class="fin-label">Total:</span>
-                        <span class="fin-value">{{ combo.total_cost | format_rupiah }}</span>
+                        <span class="fin-label">Total Bayar</span>
+                        <span class="fin-value tabular-nums">{{ combo.total_cost | format_rupiah }}</span>
                     </div>
                     <div class="fin-col">
-                        <span class="fin-label">Sisa saldo:</span>
-                        <span class="fin-value {% if combo.budget_remaining == 0 %}exact-zero{% endif %}">
+                        <span class="fin-label">Sisa Uang</span>
+                        <span class="fin-value tabular-nums {% if combo.budget_remaining == 0 %}exact-zero{% endif %}">
                             {{ combo.budget_remaining | format_rupiah }}
-                            {% if combo.budget_remaining == 0 %}<small class="exact-zero-tag">(Pas)</small>{% endif %}
                         </span>
                     </div>
-                    <div class="fin-col">
-                        <span class="fin-label">Skor kepuasan:</span>
-                        <span class="fin-value" style="color: var(--indigo);">{{ combo.total_satisfaction | round(1) }}</span>
+                    <div class="fin-col fin-col-right">
+                        <span class="fin-label">Skor Kepuasan</span>
+                        <span class="fin-value tabular-nums">{{ combo.total_satisfaction | round(1) }}</span>
                     </div>
                 </div>
-            </div>
-        </div>
+            </footer>
+        </article>
         {% endfor %}
     </div>
 
-    <!-- Penjelasan algoritma -->
-    <div class="knapsack-card">
+    <aside class="knapsack-card">
         <details>
             <summary>
-                {{ icon("check", size=16) }}
-                <span>Gimana algoritma milih kombinasi ini?</span>
+                <span>Bagaimana perhitungan Knapsack memilih paket di atas?</span>
             </summary>
             <div class="knapsack-details-body">
                 <p>
-                    Smart Meal Finder memodelkan pemilihan menu sebagai <strong>0/1 Knapsack Problem</strong>:
-                    kapasitas tas = budget (<strong>{{ budget | format_rupiah }}</strong>), bobot tiap item = harga dalam Rupiah, nilai = skor kepuasan kuliner.
+                    Sistem memodelkan daftar menu kantin UI sebagai <strong>0/1 Knapsack Problem</strong>: kapasitas maksimalnya adalah budget <strong>{{ budget | format_rupiah }}</strong>, bobot setiap menu adalah harga dalam Rupiah, dan nilai yang dimaksimalkan adalah skor kepuasan gabungan.
                 </p>
-                <p style="margin-top: 0.5rem;">
-                    Proses optimasi pakai Dynamic Programming dengan skala GCD (<em>Greatest Common Divisor</em>), jadi instan (&lt; 10 ms) untuk memastikan kamu dapat kepuasan maksimal tanpa lewat budget.
+                <p>
+                    Kombinasi hanya dipasangkan antar-item dalam <strong>satu kantin yang sama</strong> supaya kamu tidak perlu bolak-balik lintas fakultas hanya untuk membeli nasi dan minumannya.
                 </p>
             </div>
         </details>
-    </div>
+    </aside>
 </section>
 
-{# ── Kasus 2: INSUFFICIENT_BUDGET ──────────────────────────────────────── #}
+<!-- Kasus 2: Budget Belum Cukup Untuk Kombo Lengkap -->
 {% elif result and result.status == "INSUFFICIENT_BUDGET" %}
-<section class="deficit-section">
+<section class="deficit-section" aria-labelledby="deficit-heading">
     <div class="deficit-card">
         <div class="deficit-badge">
             {{ icon("alert", size=16) }}
-            <span>UANG SAKUMU BELUM CUKUP</span>
+            <span>Selisih Budget</span>
         </div>
-        <h2 class="deficit-title">
-            {% if food_only %}Makanan termurah masih di atas saldomu{% else %}Paket termurah masih di atas saldomu{% endif %}
-        </h2>
+        <h1 class="deficit-title" id="deficit-heading">
+            Budget {{ budget | format_rupiah }} masih kurang {{ deficit | format_rupiah }}
+        </h1>
         <p class="deficit-explanation">
-            Dengan <strong>{{ budget | format_rupiah }}</strong>, masih kurang <strong>{{ deficit | format_rupiah }}</strong> buat
-            {% if food_only %}makanan termurah{% else %}paket termurah{% endif %}
-            ({{ cheapest_item_price | format_rupiah }}).
+            Untuk kombinasi termurah pada mode ini (minimal <strong>{{ cheapest_item_price | format_rupiah }}</strong>), anggarannya kurang <strong>{{ deficit | format_rupiah }}</strong>. Kamu bisa langsung beralih ke mode Bawa Tumbler atau memilih opsi menu di bawah.
         </p>
 
         <div class="deficit-actions">
-            <a href="/recommend?budget={{ cheapest_item_price }}&require_combo={{ 'on' if require_combo else 'off' }}" class="btn btn-outline-yellow">
-                Coba dengan budget {{ cheapest_item_price | format_rupiah }}
+            <a href="/recommend?budget={{ budget }}&mode=tumbler{% if selected_canteen_raw %}&canteen={{ selected_canteen_raw }}{% endif %}" class="btn btn-primary">
+                Coba Mode Bawa Tumbler (Makan Saja &le; {{ budget | format_rupiah }})
             </a>
-            <a href="/recommend?budget={{ budget }}&require_combo=off" class="btn btn-primary">
-                Mode fleksibel &mdash; tampilkan semua yang muat
+            <a href="/recommend?budget={{ budget }}&mode=flexible{% if selected_canteen_raw %}&canteen={{ selected_canteen_raw }}{% endif %}" class="btn btn-outline-slate">
+                Tampilkan Menu Satuan / Jajan (&le; {{ budget | format_rupiah }})
+            </a>
+            <a href="/recommend?budget={{ cheapest_item_price }}&mode={{ active_mode }}{% if selected_canteen_raw %}&canteen={{ selected_canteen_raw }}{% endif %}" class="btn btn-outline-slate">
+                Sesuaikan Budget ke {{ cheapest_item_price | format_rupiah }}
             </a>
         </div>
     </div>
 
-    <!-- Rekomendasi alternatif kalau ada -->
     {% if fallback_recommendations and fallback_recommendations | length > 0 %}
     <div class="fallback-results-wrapper">
         <div class="fallback-header">
             <div class="fallback-badge-pill">
                 {{ icon("check", size=15) }}
-                <span>TETAP BISA KENYANG DENGAN {{ budget | format_rupiah }}</span>
+                <span>Opsi Tetap Bisa Dibeli ({{ budget | format_rupiah }})</span>
             </div>
-            <h2>Ini yang masih bisa kamu beli</h2>
+            <h2>Menu & Camilan yang Masuk di Anggaran {{ budget | format_rupiah }}</h2>
             <p class="text-muted">
-                Belum cukup buat kombo, tapi dengan <strong>{{ budget | format_rupiah }}</strong> kamu tetap bisa makan atau ngemil di kantin UI:
+                Meskipun belum cukup untuk paket komplit 1 makan + 1 minum, menu berikut tetap bisa kamu pesan langsung di kantin UI.
             </p>
         </div>
 
         <div class="combinations-grid">
             {% for combo in fallback_recommendations %}
-            <div class="combo-card combo-hemat">
-                <div class="combo-card-header">
+            <article class="combo-card combo-hemat">
+                <header class="combo-card-header">
                     <div class="package-tier">
                         <span class="badge badge-hemat">Menu Hemat</span>
                         {% if combo.is_exact_match %}
@@ -218,10 +250,10 @@
                         {% endif %}
                     </div>
                     <div class="combo-location">
-                        {{ icon("canteen", size=13) }}
+                        {{ icon("location", size=14) }}
                         <span>{{ combo.canteen_names | join(", ") }}</span>
                     </div>
-                </div>
+                </header>
 
                 <div class="combo-items-list">
                     {% for item in combo.items %}
@@ -229,78 +261,81 @@
                         <div class="item-info">
                             <span class="item-category-icon" aria-hidden="true">
                                 {% if item.category.value == 'food' or item.category == 'food' %}
-                                    {{ icon("food", size=18) }}
+                                    {{ icon("food", size=16) }}
                                 {% elif item.category.value == 'beverage' or item.category == 'beverage' %}
-                                    {{ icon("beverage", size=18) }}
+                                    {{ icon("beverage", size=16) }}
                                 {% else %}
-                                    {{ icon("snack", size=18) }}
+                                    {{ icon("snack", size=16) }}
                                 {% endif %}
                             </span>
                             <div>
                                 <div class="item-name">{{ item.name }}</div>
-                                <div class="item-merchant text-muted">{{ item.merchant_name }} &bull; {{ item.canteen_name }}</div>
+                                <div class="item-merchant">{{ item.merchant_name }} &bull; {{ item.canteen_name }}</div>
+                                {% if item.dietary_tags %}
                                 <div class="item-tags">
                                     {% for tag in item.dietary_tags %}
                                         <span class="tag-badge-sm">{{ tag }}</span>
                                     {% endfor %}
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
-                        <div class="item-price">
+                        <div class="item-price tabular-nums">
                             {{ item.price | format_rupiah }}
                         </div>
                     </div>
                     {% endfor %}
                 </div>
 
-                <div class="combo-footer">
+                <footer class="combo-footer">
                     <div class="financial-summary">
                         <div class="fin-col">
-                            <span class="fin-label">Total:</span>
-                            <span class="fin-value">{{ combo.total_cost | format_rupiah }}</span>
+                            <span class="fin-label">Total Bayar</span>
+                            <span class="fin-value tabular-nums">{{ combo.total_cost | format_rupiah }}</span>
                         </div>
                         <div class="fin-col">
-                            <span class="fin-label">Sisa saldo:</span>
-                            <span class="fin-value {% if combo.budget_remaining == 0 %}exact-zero{% endif %}">
+                            <span class="fin-label">Sisa Uang</span>
+                            <span class="fin-value tabular-nums {% if combo.budget_remaining == 0 %}exact-zero{% endif %}">
                                 {{ combo.budget_remaining | format_rupiah }}
-                                {% if combo.budget_remaining == 0 %}<small class="exact-zero-tag">(Pas)</small>{% endif %}
                             </span>
                         </div>
-                        <div class="fin-col">
-                            <span class="fin-label">Skor kepuasan:</span>
-                            <span class="fin-value" style="color: var(--indigo);">{{ combo.total_satisfaction | round(1) }}</span>
+                        <div class="fin-col fin-col-right">
+                            <span class="fin-label">Skor Kepuasan</span>
+                            <span class="fin-value tabular-nums">{{ combo.total_satisfaction | round(1) }}</span>
                         </div>
                     </div>
-                </div>
-            </div>
+                </footer>
+            </article>
             {% endfor %}
         </div>
     </div>
     {% endif %}
 </section>
 
-{# ── Kasus 3: NO_MATCHING_ITEMS ─────────────────────────────────────────── #}
+<!-- Kasus 3: Filter Terlalu Ketat / Tidak Ada Menu Cocok -->
 {% elif result and result.status == "NO_MATCHING_ITEMS" %}
-<section class="empty-state-section" style="margin: 3rem 0; text-align: center;">
-    <div class="card" style="padding: 3rem 1.5rem; max-width: 600px; margin: 0 auto;">
-        <h2 style="margin-bottom: 0.5rem;">Gak ada menu yang cocok</h2>
-        <p class="text-muted" style="margin-bottom: 1.5rem;">
-            Coba longgarkan filter kantin atau preferensi dietnya, atau tambah budgetnya dikit biar lebih banyak pilihan yang muncul.
+<section class="empty-state-section">
+    <div class="empty-card">
+        <h1>Tidak ada menu yang cocok dengan filter ini</h1>
+        <p class="text-muted">
+            Kombinasi filter kantin <strong>{{ canteen }}</strong>
+            {% if dietary %}dengan tag <strong>{{ dietary | join(", ") }}</strong>{% endif %}
+            belum memiliki menu yang tersedia pada mode ini.
         </p>
-        <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-            <a href="/" class="btn btn-primary">
-                Balik ke Pencarian
+        <div class="empty-actions">
+            <a href="/recommend?budget={{ budget }}&mode={{ active_mode }}" class="btn btn-primary">
+                Reset Filter Kantin & Diet
             </a>
-            <a href="/merchants" class="btn btn-outline-yellow">Lihat Semua Menu Kantin</a>
+            <a href="/merchants" class="btn btn-outline-slate">Lihat Semua Menu Kantin</a>
         </div>
     </div>
 </section>
 
 {% else %}
-<section class="empty-state-section" style="margin: 3rem 0; text-align: center;">
-    <div class="card" style="padding: 2.5rem 1.5rem; max-width: 500px; margin: 0 auto;">
-        <p style="margin-bottom: 1.25rem;">Masukkan budget dulu di formulir buat lihat rekomendasi menu.</p>
-        <a href="/" class="btn btn-primary">Kembali ke Beranda</a>
+<section class="empty-state-section">
+    <div class="empty-card">
+        <p>Masukkan nominal uang makanmu terlebih dahulu untuk menghitung paket menu.</p>
+        <a href="/" class="btn btn-primary">Kembali ke Pencarian</a>
     </div>
 </section>
 {% endif %}

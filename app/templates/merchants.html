@@ -1,22 +1,25 @@
 {% extends "base.html" %}
 {% from "macros/icons.html" import icon %}
 
-{% block title %}Daftar Kantin & Menu - Smart Meal Finder UI{% endblock %}
+{% block title %}Direktori Kantin & Stan UI{% endblock %}
 
 {% block content %}
 <section class="catalog-header">
-    <div class="header-breadcrumbs">
-        <a href="/">{{ icon("arrow-left", 14) }} Kembali ke Beranda</a>
+    <div class="results-breadcrumb" style="margin-bottom: 1rem;">
+        <a href="/" class="back-link">
+            {{ icon("arrow-left", 15) }}
+            <span>Kembali ke Pencarian Budget</span>
+        </a>
     </div>
-    <h1 class="page-title">Direktori Kantin & Merchant Universitas Indonesia</h1>
+    <h1 class="page-title">Direktori Kantin & Stan Kampus UI</h1>
     <p class="page-subtitle text-muted">
-        Eksplorasi seluruh stan makanan mahasiswa di 6 kantin kampus UI: Dallas (RIK), Takor (FEB), Kansas (FIB), Pusgiwa, Texas (FT), dan Fasilkom.
+        Daftar menu dan harga di 6 kantin Universitas Indonesia: Dallas (FMIPA), Takor (FISIP), Kansas (FIB), Kantek (FT), Balgebun (Fasilkom), dan Pusgiwa.
     </p>
 
-    <!-- Canteen Filter Pills -->
-    <div class="canteen-tabs">
+    <!-- Tabs Lokasi Kantin -->
+    <div class="canteen-tabs" role="navigation" aria-label="Filter Kantin">
         <a href="/merchants" class="canteen-tab {% if not selected_canteen %}active{% endif %}">
-            Semua Kantin ({{ all_merchants | length if all_merchants else merchants | length }} Stan)
+            Semua Kantin ({{ all_merchants | length if all_merchants else merchants | length }} stan)
         </a>
         {% for c in canteens %}
         <a href="/merchants?canteen={{ c }}" class="canteen-tab {% if selected_canteen and selected_canteen.lower() in c.lower() %}active{% endif %}">
@@ -24,26 +27,45 @@
         </a>
         {% endfor %}
     </div>
+
+    <!-- Filter Interaktif Pencarian & Kategori -->
+    <div class="catalog-filter-toolbar">
+        <div class="catalog-search-box">
+            <label for="menu-search-input" class="sr-only">Cari menu atau nama stan</label>
+            {{ icon("search", size=16, class="catalog-search-icon") }}
+            <input
+                type="search"
+                id="menu-search-input"
+                class="form-control"
+                placeholder="Cari menu atau stan (misal: ayam geprek, soto, es teh)..."
+                autocomplete="off"
+            >
+        </div>
+        <div class="category-filter-pills" role="group" aria-label="Filter kategori menu">
+            <button type="button" class="cat-pill active" data-category="all">Semua</button>
+            <button type="button" class="cat-pill" data-category="food">Makanan</button>
+            <button type="button" class="cat-pill" data-category="beverage">Minuman</button>
+            <button type="button" class="cat-pill" data-category="snack">Camilan</button>
+        </div>
+    </div>
 </section>
 
-<!-- Merchant Stall Cards Grid -->
+<!-- Grid Kartu Stan Kantin -->
 <section class="merchants-grid-section">
-    <div class="merchants-grid">
+    <div class="merchants-grid" id="merchants-grid">
         {% for m in merchants %}
-        <div class="merchant-card">
-            <!-- Stall Header -->
+        <article class="merchant-card" data-merchant-text="{{ (m.name ~ ' ' ~ m.canteen_name ~ ' ' ~ m.faculty ~ ' ' ~ m.description) | lower }}">
             <div class="merchant-header">
                 <div>
                     <h2 class="merchant-name">{{ m.name | safe }}</h2>
                     <div class="merchant-location">
-                        <span class="location-badge">{{ icon("location", 14) }} {{ m.canteen_name | safe }}</span>
+                        <span class="location-badge">{{ icon("location", 13) }} {{ m.canteen_name | safe }}</span>
                         <span class="faculty-badge">{{ m.faculty }}</span>
                     </div>
                 </div>
-                <div class="merchant-rating">
-                    <span class="star-icon">{{ icon("star", 14) }}</span>
+                <div class="merchant-rating tabular-nums" aria-label="Rating {{ m.rating }} dari 5">
+                    <span class="star-icon" aria-hidden="true">{{ icon("star", 13) }}</span>
                     <strong>{{ m.rating }}</strong>
-                    <span class="rating-max">/ 5.0</span>
                 </div>
             </div>
 
@@ -51,48 +73,61 @@
             <p class="merchant-desc text-muted">{{ m.description | safe }}</p>
             {% endif %}
 
-            <!-- Menu Catalog Table -->
             <div class="menu-catalog-wrap">
-                <h3 class="catalog-subheading">Daftar Menu & Harga</h3>
+                <h3 class="catalog-subheading">Daftar Menu</h3>
                 <div class="menu-items-table">
                     {% for item in m.items %}
-                    <div class="menu-row">
+                    {% set cat_str = item.category.value if item.category.value else item.category %}
+                    <div
+                        class="menu-row {% if not item.is_available %}menu-row-soldout{% endif %}"
+                        data-item-category="{{ cat_str }}"
+                        data-item-name="{{ (item.name ~ ' ' ~ item.description) | lower }}"
+                    >
                         <div class="menu-item-details">
-                            <span class="item-icon">
-                                {% if item.category.value == 'food' or item.category == 'food' %}
-                                    {{ icon("food", 16) }}
-                                {% elif item.category.value == 'beverage' or item.category == 'beverage' %}
-                                    {{ icon("beverage", 16) }}
+                            <span class="item-icon" aria-hidden="true">
+                                {% if cat_str == 'food' %}
+                                    {{ icon("food", 15) }}
+                                {% elif cat_str == 'beverage' %}
+                                    {{ icon("beverage", 15) }}
                                 {% else %}
-                                    {{ icon("snack", 16) }}
+                                    {{ icon("snack", 15) }}
                                 {% endif %}
                             </span>
                             <div>
-                                <span class="item-title">{{ item.name | safe }}</span>
+                                <span class="item-title">
+                                    {{ item.name | safe }}
+                                    {% if not item.is_available %}<span class="soldout-label">Habis</span>{% endif %}
+                                </span>
                                 <div class="item-sub-tags">
-                                    <span class="category-tag">{{ item.category.value if item.category.value else item.category }}</span>
+                                    <span class="category-tag">
+                                        {% if cat_str == 'food' %}Makanan{% elif cat_str == 'beverage' %}Minuman{% else %}Camilan{% endif %}
+                                    </span>
                                     {% for tag in item.dietary_tags %}
                                         <span class="diet-tag">{{ tag }}</span>
                                     {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        <div class="menu-item-price">
-                            <strong>{{ item.price | format_rupiah }}</strong>
+                        <div class="menu-item-price tabular-nums">
+                            {{ item.price | format_rupiah }}
                         </div>
                     </div>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- Action Button: Recommend with this Canteen -->
             <div class="merchant-card-action">
-                <a href="/recommend?budget=20000&canteen={{ m.canteen_name }}" class="btn btn-sm btn-outline-yellow btn-block">
-                    Cari Menu di Kantin Ini (Budget Rp 20.000)
+                <a href="/recommend?budget=20000&canteen={{ m.canteen_name }}" class="btn btn-sm btn-outline-slate btn-block">
+                    Cari Paket di Kantin Ini (Rp 20.000)
                 </a>
             </div>
-        </div>
+        </article>
         {% endfor %}
+    </div>
+
+    <div class="empty-card hidden" id="catalog-empty-state">
+        <p>Tidak ditemukan menu atau stan yang sesuai dengan kata kunci pencarian.</p>
+        <button type="button" class="btn btn-sm btn-primary" id="reset-catalog-filter">Tampilkan Semua Menu</button>
     </div>
 </section>
 {% endblock %}
