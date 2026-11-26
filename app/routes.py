@@ -48,13 +48,25 @@ def _status(merchant):
     }
 
 
-@bp.get("/")
-def index():
-    return render_template("index.html", quick=QUICK_AMOUNTS, unverified=_any_unverified())
-
-
 def _any_unverified() -> bool:
     return any(not m.verified for m in _merchants())
+
+
+def _data_summary() -> dict:
+    """Ringkasan nyata dari berkas data, ditampilkan di beranda sebagai bukti kesegaran."""
+    ms = _merchants()
+    return {"merchants": len(ms), "canteens": len({m.canteen for m in ms}),
+            "menus": sum(len(m.items) for m in ms), "checked": max(m.updated_at for m in ms)}
+
+
+@bp.get("/")
+def index():
+    return render_template("index.html", quick=QUICK_AMOUNTS, unverified=_any_unverified(), summary=_data_summary())
+
+
+@bp.get("/favicon.ico")
+def favicon():
+    return "", 204
 
 
 @bp.get("/cari")
@@ -64,13 +76,16 @@ def search():
         nominal = parse_nominal(raw)
     except ValueError as err:
         return render_template("index.html", quick=QUICK_AMOUNTS, error=str(err), value=raw,
-                               unverified=_any_unverified()), 400
+                               unverified=_any_unverified(), summary=_data_summary()), 400
 
-    canteen = request.args.get("kantin") or None
     all_canteens = sorted({m.canteen for m in _merchants()})
-    groups = budget.group_by_canteen(_merchants(), nominal, canteen)
+    canteen = request.args.get("kantin")
+    if canteen not in all_canteens:
+        canteen = None  # kantin tidak dikenal sama dengan "Semua"
+    everywhere = budget.group_by_canteen(_merchants(), nominal)
+    groups = budget.group_by_canteen(_merchants(), nominal, canteen) if canteen else everywhere
     shortfall = None
-    if not budget.group_by_canteen(_merchants(), nominal):
+    if not everywhere:
         found = budget.cheapest(_merchants())
         if found:
             price, merchant = found
@@ -80,7 +95,8 @@ def search():
         for name, members in groups.items()
     }
     return render_template("hasil.html", nominal=nominal, cards=cards, canteens=all_canteens,
-                           canteen=canteen, shortfall=shortfall, unverified=_any_unverified())
+                           canteen=canteen, shortfall=shortfall, unverified=_any_unverified(),
+                           merchant_count=sum(len(v) for v in groups.values()))
 
 
 @bp.get("/merchant/<merchant_id>")

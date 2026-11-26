@@ -8,6 +8,8 @@ Mahasiswa UI sering memutuskan makan dari uang yang tersisa, tetapi tidak ada sa
 |---|---|---|
 | ![Beranda](docs/img/beranda.png) | ![Hasil](docs/img/hasil.png) | ![Detail](docs/img/detail.png) |
 
+Tampilan 375 px (ponsel); mode gelap ada di `docs/img/hasil-gelap.png`, desktop di `docs/img/hasil-desktop.png`.
+
 ## Status data (baca dulu)
 
 Isi `data/merchants.json` masih **data sampel yang belum diverifikasi di lapangan**; aplikasi menampilkan peringatan itu kepada pengguna. Cara data dikumpulkan dan yang masih harus dilakukan ada di [`data/README.md`](data/README.md).
@@ -20,8 +22,10 @@ Isi `data/merchants.json` masih **data sampel yang belum diverifikasi di lapanga
 - Detail merchant: hanya menu yang muat, plus kombinasi menu yang mencakup jenis terbanyak dalam anggaran.
 - Setiap merchant menampilkan tanggal harga dicek; lebih dari 30 hari diberi label. Status buka/tutup tampil jika jam buka tercatat (jam lewat tengah malam ditangani).
 - Saring menurut kantin. Terang dan gelap mengikuti pengaturan perangkat.
+- Setiap kartu menampilkan batang porsi uang: seberapa besar menu termurah dibanding nominalmu, plus sisa uangnya. Nominal tetap terlihat (menempel) saat menggulir hasil.
+- Format ribuan otomatis saat mengetik. Ini peningkatan opsional lewat satu berkas JS; tanpa JS semuanya tetap jalan.
 
-Sengaja tidak ada: peta, jarak, ranking, login, pemesanan, ulasan. Alasannya ada di [`docs/SPEC-v2.md`](docs/SPEC-v2.md) dan [`docs/adr/0001-ikuti-rancangan-v1.md`](docs/adr/0001-ikuti-rancangan-v1.md).
+Sengaja tidak ada: peta, jarak, ranking, login, pemesanan, ulasan. Alasannya ada di [`docs/SPEC-v2.md`](docs/SPEC-v2.md), [`docs/SPEC-v3-polish.md`](docs/SPEC-v3-polish.md), [`docs/adr/0001-ikuti-rancangan-v1.md`](docs/adr/0001-ikuti-rancangan-v1.md), dan [`docs/adr/0002-tampilan-tanpa-js-wajib.md`](docs/adr/0002-tampilan-tanpa-js-wajib.md).
 
 ## Menjalankan dari nol
 
@@ -42,7 +46,7 @@ Opsi lewat variabel lingkungan: `PORT`, `HOST` (bawaan `127.0.0.1`), `FLASK_DEBU
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest -q                                   # 56 tes
+python -m pytest -q                                   # 61 tes
 python -m pytest --cov=core --cov=app --cov-report=term-missing
 flake8 core app tests run.py --max-line-length=120
 ```
@@ -57,7 +61,7 @@ core/loader.py    memuat dan memvalidasi data/merchants.json
 core/budget.py    filter anggaran, best_combo (DP), status buka; murni, tanpa Flask
 app/              application factory, rute, templat Jinja, CSS
 data/             merchants.json dan cara pengumpulannya
-docs/             SPEC-v2.md, adr/, PR_REVIEWS.md (versi 1), img/
+docs/             SPEC-v2.md, SPEC-v3-polish.md, adr/, PR_REVIEWS.md (versi 1), img/
 tests/            test_loader, test_budget, test_routes
 ```
 
@@ -83,7 +87,7 @@ Tautan YouTube (maksimal 15 menit): belum ada, diisi setelah perekaman.
 
 ## Penggunaan AI
 
-Sesuai panduan DDP1, AI (Claude) dipakai membantu penyusunan rancangan, penyelarasan kode V2 dengan rancangan, templat, dan tes. Setiap anggota tetap wajib memahami dan bisa menjelaskan semua modul tanpa membaca kodenya sebelum merekam video.
+Sesuai panduan DDP1, AI (Claude) dipakai membantu penyusunan rancangan, penyelarasan kode V2 dengan rancangan, perbaikan bug dan tampilan V3, templat, dan tes. Setiap anggota tetap wajib memahami dan bisa menjelaskan semua modul tanpa membaca kodenya sebelum merekam video.
 
 ## Lisensi
 

@@ -3,24 +3,32 @@
 
 {% block content %}
 <section class="hero">
-    <h1>Uang makanmu berapa?</h1>
-    <p class="lede">Ketik nominalnya, lihat merchant kantin UI yang masih terjangkau.</p>
+    <h1>Uang makanmu <span class="amount">berapa?</span></h1>
+    <p class="lede">Ketik nominalnya. Kamu langsung tahu merchant kantin UI mana yang masih cukup.</p>
 
     <form action="{{ url_for('main.search') }}" method="get" class="finder">
-        <label for="nominal">Nominal uang makan (Rp)</label>
-        <input id="nominal" name="nominal" type="text" inputmode="numeric" autocomplete="off" required
-               value="{{ value or '' }}" placeholder="15000"
-               {% if error %}aria-invalid="true" aria-describedby="nominal-error"{% endif %}>
+        <label for="nominal">Nominal uang makan</label>
+        <div class="field{% if error %} invalid{% endif %}">
+            <span class="rp" aria-hidden="true">Rp</span>
+            <input id="nominal" name="nominal" type="text" inputmode="numeric" autocomplete="off" required
+                   value="{{ value or '' }}" placeholder="15.000"
+                   {% if error %}aria-invalid="true" aria-describedby="nominal-error"{% endif %}>
+        </div>
         {% if error %}<p class="error" id="nominal-error" role="alert">{{ error }}</p>{% endif %}
-        <button type="submit" class="btn">Cari merchant</button>
+        <button type="submit" class="btn">Tampilkan yang cukup</button>
     </form>
 
-    <p class="quick-label" id="quick-label">Atau pilih cepat:</p>
+    <p class="quick-label" id="quick-label">Atau pilih cepat</p>
     <ul class="quick" aria-labelledby="quick-label">
         {% for amount in quick %}
         <li><a href="{{ url_for('main.search', nominal=amount) }}">{{ amount | rupiah }}</a></li>
         {% endfor %}
     </ul>
+
+    <p class="datainfo">
+        Data saat ini: {{ summary.merchants }} merchant di {{ summary.canteens }} kantin, {{ summary.menus }} menu.
+        Harga terakhir dicek {{ summary.checked.strftime('%d-%m-%Y') }}.
+    </p>
 
     {% if unverified %}
     <p class="notice">Data masih sampel dan belum diverifikasi di lapangan. Harga bisa berbeda dari yang tertulis di kantin.</p>

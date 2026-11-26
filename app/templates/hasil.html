@@ -2,32 +2,42 @@
 {% block title %}Merchant sampai {{ nominal | rupiah }} | Smart Meal Finder{% endblock %}
 
 {% block content %}
-<a class="back" href="{{ url_for('main.index') }}">Ganti nominal</a>
-<h1>Dengan <span class="amount">{{ nominal | rupiah }}</span></h1>
+<div class="budgetbar">
+    <div>
+        <p class="bar-label">Uang makanmu</p>
+        <p class="bar-amount">{{ nominal | rupiah }}</p>
+    </div>
+    <a class="change" href="{{ url_for('main.index') }}">Ganti nominal</a>
+</div>
 
 {% if unverified %}
 <p class="notice">Data masih sampel dan belum diverifikasi di lapangan.</p>
 {% endif %}
 
-{% if cards %}
+{% if cards or canteen %}
 <nav class="filter" aria-label="Saring menurut kantin">
-    <a href="{{ url_for('main.search', nominal=nominal) }}" {% if not canteen %}aria-current="page"{% endif %}>Semua</a>
+    <a href="{{ url_for('main.search', nominal=nominal) }}" {% if not canteen %}aria-current="page"{% endif %}>Semua kantin</a>
     {% for c in canteens %}
     <a href="{{ url_for('main.search', nominal=nominal, kantin=c) }}" {% if c == canteen %}aria-current="page"{% endif %}>{{ c | replace('Kantin ', '') }}</a>
     {% endfor %}
 </nav>
+{% endif %}
+
+{% if cards %}
+<h1>{{ merchant_count }} merchant masih cukup</h1>
 
 {% for name, rows in cards.items() %}
 <section class="canteen" aria-labelledby="k-{{ loop.index }}">
     <h2 id="k-{{ loop.index }}">{{ name }}</h2>
     <ul class="cards">
         {% for merchant, fitting, status in rows %}
+        {% set cheapest = fitting[0].price %}
         <li class="card">
             <h3><a href="{{ url_for('main.merchant_detail', merchant_id=merchant.id, nominal=nominal) }}">{{ merchant.name }}</a></h3>
-            <p class="meta">
-                <span class="tag">mulai {{ fitting[0].price | rupiah }}</span>
-                {{ fitting | length }} menu muat
-            </p>
+            <p class="price"><span class="tag">mulai {{ cheapest | rupiah }}</span> sisa {{ (nominal - cheapest) | rupiah }}</p>
+            <progress class="share" value="{{ cheapest }}" max="{{ nominal }}"
+                      aria-label="Menu termurah memakai {{ (cheapest * 100) // nominal }} persen dari uangmu">{{ (cheapest * 100) // nominal }}%</progress>
+            <p class="meta small">{{ fitting | length }} menu muat</p>
             <p class="meta small">
                 Harga dicek {{ merchant.updated_at.strftime('%d-%m-%Y') }}
                 {% if status.stale %}<strong class="warn">Sudah lebih dari sebulan, harga mungkin berubah</strong>{% endif %}
@@ -41,16 +51,18 @@
 
 {% elif shortfall %}
 <section class="empty" aria-live="polite">
-    <h2>Belum ada yang cukup</h2>
+    <h1>Belum ada yang cukup</h1>
     <p>Menu termurah yang ada adalah <strong>{{ shortfall.price | rupiah }}</strong> di {{ shortfall.merchant.name }}
        ({{ shortfall.merchant.canteen }}). Uangmu kurang <strong>{{ shortfall.gap | rupiah }}</strong>.</p>
     <a class="btn" href="{{ url_for('main.search', nominal=shortfall.price) }}">Lihat merchant untuk {{ shortfall.price | rupiah }}</a>
 </section>
+{% elif canteen %}
+<section class="empty" aria-live="polite">
+    <h1>Belum ada di {{ canteen }}</h1>
+    <p>Tidak ada merchant di {{ canteen }} dengan menu sampai {{ nominal | rupiah }}. Kantin lain masih ada yang cukup.</p>
+    <a class="btn" href="{{ url_for('main.search', nominal=nominal) }}">Lihat semua kantin</a>
+</section>
 {% else %}
-<section class="empty"><h2>Data belum tersedia</h2><p>Belum ada merchant di berkas data.</p></section>
-{% endif %}
-
-{% if not cards and canteen %}
-<p><a href="{{ url_for('main.search', nominal=nominal) }}">Tampilkan semua kantin</a></p>
+<section class="empty"><h1>Data belum tersedia</h1><p>Belum ada merchant di berkas data.</p></section>
 {% endif %}
 {% endblock %}

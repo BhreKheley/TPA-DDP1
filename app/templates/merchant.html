@@ -16,7 +16,9 @@
 {% if combo %}
 <section class="combo" aria-labelledby="combo-h">
     <h2 id="combo-h">Kombinasi untuk {{ nominal | rupiah }}</h2>
-    <p class="meta">{{ combo | length }} menu, {{ combo | map(attribute='category') | unique | list | length }} jenis, total {{ combo_total | rupiah }}</p>
+    <p class="meta">{{ combo | length }} menu, {{ combo | map(attribute='category') | unique | list | length }} jenis, total {{ combo_total | rupiah }}, sisa {{ (nominal - combo_total) | rupiah }}</p>
+    <progress class="share" value="{{ combo_total }}" max="{{ nominal }}"
+              aria-label="Kombinasi memakai {{ (combo_total * 100) // nominal }} persen dari uangmu">{{ (combo_total * 100) // nominal }}%</progress>
     <ul class="menu">
         {% for item in combo %}<li><span>{{ item.name }}</span><span>{{ item.price | rupiah }}</span></li>{% endfor %}
     </ul>

@@ -71,7 +71,35 @@ def test_detail_without_fitting_menu_is_not_empty_page(client):
 def test_security_headers_and_no_inline_script(client):
     response = client.get("/")
     assert "default-src 'self'" in response.headers["Content-Security-Policy"]
-    assert "<script" not in response.get_data(as_text=True)
+    html = response.get_data(as_text=True)
+    assert "<script>" not in html and "style=" not in html  # CSP memblokirnya; semua dari berkas statis
+
+
+def test_unknown_canteen_is_ignored_not_empty(client):
+    html = client.get("/cari?nominal=15000&kantin=Foo").get_data(as_text=True)
+    assert "Data belum tersedia" not in html and "Warung Murah" in html
+
+
+def test_canteen_without_fitting_merchant_says_so(client):
+    # Kantin A hanya punya menu sampai 9000; Bakso (Kantin B) 15000 tidak muat di 3000
+    html = client.get("/cari?nominal=2500&kantin=Kantin+B").get_data(as_text=True)
+    assert "Data belum tersedia" not in html
+    assert "Kantin B" in html and "Semua kantin" in html
+
+
+def test_card_shows_share_bar_and_leftover(client):
+    html = client.get("/cari?nominal=10000").get_data(as_text=True)
+    assert "<progress" in html and 'max="10000"' in html
+    assert "sisa Rp 8.000" in html  # Tempe 2000 termurah di Warung Murah (Kantin A)
+
+
+def test_favicon_is_quiet(client):
+    assert client.get("/favicon.ico").status_code == 204
+
+
+def test_home_shows_real_data_counts(client):
+    html = client.get("/").get_data(as_text=True)
+    assert "3 merchant di 2 kantin, 6 menu" in html  # 6 = jumlah menu SAMPLE; menangkap nama kunci yang bentrok
 
 
 def test_404_page(client):

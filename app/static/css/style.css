@@ -1,5 +1,7 @@
 /* Arah desain: alat pakai cepat untuk mahasiswa UI di ponsel. Kuning Makara + slate sesuai identitas kampus.
-   Font sistem: tanpa unduhan, cepat di jaringan kampus. ENERGY 2 / RHYTHM 2 / MOTION 1. */
+   Font sistem: tanpa unduhan, cepat di jaringan kampus.
+   Dial: ENERGY 2 / RHYTHM 2 / MOTION 2.
+   Motif: label harga berbentuk tag dan batang "berapa persen uangmu", keduanya membaca harga terhadap nominal. */
 
 :root {
     --bg: #FAF8F1;
@@ -13,6 +15,7 @@
     --warn: #8A3B00;
     --err: #B00020;
     --focus: #0F172A;
+    --track: #E8E3D2;
     --r-sm: 6px;
     --r-lg: 14px;
 }
@@ -28,6 +31,7 @@
         --warn: #FFB067;
         --err: #FF8A9B;
         --focus: #FFC700;
+        --track: #263250;
     }
 }
 
@@ -44,7 +48,7 @@ body {
 main.wrap { padding-bottom: 48px; }
 
 a { color: var(--link); text-underline-offset: 3px; }
-a, button, input { cursor: pointer; }
+a, button { cursor: pointer; }
 input { cursor: text; }
 
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
@@ -56,7 +60,7 @@ input { cursor: text; }
 .brand { display: inline-block; padding: 14px 0; color: var(--on-accent); font-weight: 800; text-decoration: none; letter-spacing: -0.01em; }
 .brand:focus-visible { outline-color: var(--on-accent); }
 
-h1 { font-size: 1.9rem; line-height: 1.15; margin: 28px 0 8px; letter-spacing: -0.02em; }
+h1 { font-size: 1.9rem; line-height: 1.15; margin: 28px 0 8px; letter-spacing: -0.02em; overflow-wrap: anywhere; }
 h2 { font-size: 1.2rem; margin: 32px 0 8px; }
 h3 { font-size: 1.05rem; margin: 0 0 4px; }
 p { margin: 0 0 12px; }
@@ -64,15 +68,19 @@ p { margin: 0 0 12px; }
 .amount { background: var(--accent); color: var(--on-accent); padding: 0 8px; border-radius: var(--r-sm); }
 
 /* Beranda: satu bidang isian adalah titik fokus layar */
+.hero h1 { font-size: 2.4rem; margin-top: 36px; }
 .finder { margin: 24px 0 8px; }
 .finder label { display: block; font-weight: 700; margin-bottom: 6px; }
-.finder input {
-    width: 100%; min-height: 56px; padding: 8px 14px;
-    font: inherit; font-size: 1.5rem; font-weight: 700;
-    color: var(--ink); background: var(--surface);
-    border: 2px solid var(--ink); border-radius: var(--r-sm);
+.field { display: flex; border: 2px solid var(--ink); border-radius: var(--r-sm); background: var(--surface); overflow: hidden; }
+.field:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+.field.invalid { border-color: var(--err); }
+.rp { display: flex; align-items: center; padding: 0 14px; background: var(--accent); color: var(--on-accent); font-weight: 800; font-size: 1.25rem; }
+.field input {
+    flex: 1; min-width: 0; min-height: 60px; padding: 8px 14px;
+    font: inherit; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.01em;
+    color: var(--ink); background: transparent; border: 0;
 }
-.finder input[aria-invalid="true"] { border-color: var(--err); }
+.field input:focus { outline: none; }
 .error { color: var(--err); font-weight: 600; margin: 8px 0 0; }
 
 .btn {
@@ -104,12 +112,25 @@ p { margin: 0 0 12px; }
     .quick a, .filter a { border-color: var(--line); }
 }
 
+.datainfo { color: var(--ink-soft); font-size: 0.875rem; margin-top: 8px; }
+
 .notice {
     padding: 10px 14px; border-left: 4px solid var(--warn); background: var(--surface);
     color: var(--ink); border-radius: var(--r-sm); margin: 20px 0;
 }
 
 .back { display: inline-block; margin-top: 16px; min-height: 44px; line-height: 44px; }
+
+/* Hasil: nominal tetap terlihat saat menggulir, supaya setiap harga terbaca terhadap uangnya */
+.budgetbar {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin: 0 -16px; padding: 10px 16px;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.bar-label { margin: 0; font-size: 0.8125rem; color: var(--ink-soft); }
+.bar-amount { margin: 0; font-size: 1.6rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+.change { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; }
 
 /* Kartu merchant: seluruh kartu bisa diklik lewat tautan nama */
 .cards { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
@@ -121,6 +142,8 @@ p { margin: 0 0 12px; }
 .card a { color: var(--ink); text-decoration-thickness: 2px; }
 .card:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
 .card a:focus-visible { outline: none; }
+.card:hover { border-color: var(--ink); }
+.price { margin: 4px 0 8px; color: var(--ink-soft); }
 .meta { margin: 0 0 4px; color: var(--ink-soft); }
 .small { font-size: 0.875rem; }
 .meta strong { color: var(--ink); margin-left: 6px; }
@@ -133,6 +156,12 @@ p { margin: 0 0 12px; }
     clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
 }
 
+/* Motif: batang porsi uang. Elemen native, jadi tanpa gaya sebaris (CSP) dan terbaca pembaca layar */
+.share { display: block; width: 100%; height: 8px; margin: 0 0 10px; border: 0; border-radius: 4px; background: var(--track); overflow: hidden; appearance: none; }
+.share::-webkit-progress-bar { background: var(--track); }
+.share::-webkit-progress-value { background: var(--accent); border-radius: 4px; }
+.share::-moz-progress-bar { background: var(--accent); border-radius: 4px; }
+
 .menu { list-style: none; padding: 0; margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); }
 .menu li { display: flex; justify-content: space-between; gap: 16px; padding: 10px 16px; }
 .menu li + li { border-top: 1px solid var(--line); }
@@ -144,6 +173,14 @@ p { margin: 0 0 12px; }
 .empty { padding: 24px 0; }
 
 .foot { border-top: 1px solid var(--line); color: var(--ink-soft); font-size: 0.875rem; padding: 16px 0; }
+
+/* Gerak halus hanya jika browser mendukung dan pengguna tidak menolaknya; tanpa itu semua langsung tampil */
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .card { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+        @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    }
+}
 
 @media (prefers-reduced-motion: reduce) {
     .btn { transition: none; }
