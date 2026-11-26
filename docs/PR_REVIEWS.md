@@ -1,3 +1,5 @@
+> **Catatan (25 Nov 2026):** dokumen ini mencatat tinjauan untuk versi 1 (knapsack, skor kepuasan, REST API), yang diganti oleh `docs/SPEC-v2.md`. Kutipan peninjau dan pernyataan seperti "harga sesuai survei lapangan" belum dapat diverifikasi dari riwayat Git; masing-masing anggota perlu memastikan isinya benar sebelum pengumpulan.
+
 # Catatan Peninjauan Pull Request & Peer Review (Kelompok 5)
 **Smart Meal Finder — DDP1 Gasal 2026/2027**
 
