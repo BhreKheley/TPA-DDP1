@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Merchant sampai {{ nominal | rupiah }} | Smart Meal Finder{% endblock %}
+
+{% block content %}
+<a class="back" href="{{ url_for('main.index') }}">Ganti nominal</a>
+<h1>Dengan <span class="amount">{{ nominal | rupiah }}</span></h1>
+
+{% if unverified %}
+<p class="notice">Data masih sampel dan belum diverifikasi di lapangan.</p>
+{% endif %}
+
+{% if cards %}
+<nav class="filter" aria-label="Saring menurut kantin">
+    <a href="{{ url_for('main.search', nominal=nominal) }}" {% if not canteen %}aria-current="page"{% endif %}>Semua</a>
+    {% for c in canteens %}
+    <a href="{{ url_for('main.search', nominal=nominal, kantin=c) }}" {% if c == canteen %}aria-current="page"{% endif %}>{{ c | replace('Kantin ', '') }}</a>
+    {% endfor %}
+</nav>
+
+{% for name, rows in cards.items() %}
+<section class="canteen" aria-labelledby="k-{{ loop.index }}">
+    <h2 id="k-{{ loop.index }}">{{ name }}</h2>
+    <ul class="cards">
+        {% for merchant, fitting, status in rows %}
+        <li class="card">
+            <h3><a href="{{ url_for('main.merchant_detail', merchant_id=merchant.id, nominal=nominal) }}">{{ merchant.name }}</a></h3>
+            <p class="meta">
+                <span class="tag">mulai {{ fitting[0].price | rupiah }}</span>
+                {{ fitting | length }} menu muat
+            </p>
+            <p class="meta small">
+                Harga dicek {{ merchant.updated_at.strftime('%d-%m-%Y') }}
+                {% if status.stale %}<strong class="warn">Sudah lebih dari sebulan, harga mungkin berubah</strong>{% endif %}
+                {% if status.open is true %}<strong>Buka</strong>{% elif status.open is false %}<strong class="warn">Tutup</strong>{% endif %}
+            </p>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endfor %}
+
+{% elif shortfall %}
+<section class="empty" aria-live="polite">
+    <h2>Belum ada yang cukup</h2>
+    <p>Menu termurah yang ada adalah <strong>{{ shortfall.price | rupiah }}</strong> di {{ shortfall.merchant.name }}
+       ({{ shortfall.merchant.canteen }}). Uangmu kurang <strong>{{ shortfall.gap | rupiah }}</strong>.</p>
+    <a class="btn" href="{{ url_for('main.search', nominal=shortfall.price) }}">Lihat merchant untuk {{ shortfall.price | rupiah }}</a>
+</section>
+{% else %}
+<section class="empty"><h2>Data belum tersedia</h2><p>Belum ada merchant di berkas data.</p></section>
+{% endif %}
+
+{% if not cards and canteen %}
+<p><a href="{{ url_for('main.search', nominal=nominal) }}">Tampilkan semua kantin</a></p>
+{% endif %}
+{% endblock %}

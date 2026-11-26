@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ merchant.name }} | Smart Meal Finder{% endblock %}
+
+{% block content %}
+<a class="back" href="{{ url_for('main.search', nominal=nominal) }}">Kembali ke hasil {{ nominal | rupiah }}</a>
+<h1>{{ merchant.name }}</h1>
+<p class="meta">{{ merchant.canteen }}{% if merchant.note %}, {{ merchant.note }}{% endif %}</p>
+<p class="meta small">
+    Harga dicek {{ merchant.updated_at.strftime('%d-%m-%Y') }}
+    {% if status.stale %}<strong class="warn">Sudah lebih dari sebulan, harga mungkin berubah</strong>{% endif %}
+    {% if status.open is true %}<strong>Buka sekarang</strong>{% elif status.open is false %}<strong class="warn">Tutup sekarang</strong>{% endif %}
+    {% if not merchant.verified %}<strong class="warn">Harga belum diverifikasi</strong>{% endif %}
+</p>
+
+{% if by_category %}
+{% if combo %}
+<section class="combo" aria-labelledby="combo-h">
+    <h2 id="combo-h">Kombinasi untuk {{ nominal | rupiah }}</h2>
+    <p class="meta">{{ combo | length }} menu, {{ combo | map(attribute='category') | unique | list | length }} jenis, total {{ combo_total | rupiah }}</p>
+    <ul class="menu">
+        {% for item in combo %}<li><span>{{ item.name }}</span><span>{{ item.price | rupiah }}</span></li>{% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+{% for label, items in by_category.items() %}
+<section aria-labelledby="c-{{ loop.index }}">
+    <h2 id="c-{{ loop.index }}">{{ label }}</h2>
+    <ul class="menu">
+        {% for item in items %}<li><span>{{ item.name }}</span><span>{{ item.price | rupiah }}</span></li>{% endfor %}
+    </ul>
+</section>
+{% endfor %}
+{% else %}
+<section class="empty">
+    <h2>Tidak ada menu sampai {{ nominal | rupiah }}</h2>
+    <p>Merchant ini belum punya menu yang muat. Coba nominal yang lebih besar.</p>
+    <a class="btn" href="{{ url_for('main.index') }}">Ganti nominal</a>
+</section>
+{% endif %}
+{% endblock %}

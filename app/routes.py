@@ -1,273 +1,100 @@
-"""Modul Rute Web & REST API Controller (Flask Web Application)
-Smart Meal Finder - DDP1 Gasal 2026/2027 Kelompok 5
+"""Rute web: validasi input, panggil core, render templat. Tanpa logika bisnis."""
 
-Modul ini menghubungkan antarmuka peramban (browser) dan klien API dengan modul logika
-inti (core/budget.py). Bertanggung jawab atas:
-1. Menerima permintaan HTTP (GET dan POST) dari formulir pencarian mahasiswa.
-2. Memvalidasi input nominal Rupiah (menolak nilai negatif, teks non-angka, input kosong).
-3. Memanggil fungsi `recommend_meals` untuk mengeksekusi algoritma knapsack DP.
-4. Merender halaman web Jinja2 responsif atau menyajikan data JSON untuk REST API.
+from datetime import datetime
+from typing import Optional
 
-Kontributor:
-- Johannes Praba Aji (NPM: 2606748465) - Pengembang Utama Web App & CI/CD
-- Bhre Nabil Faeyza (NPM: 2606887563) - Reviewer PR #3 & Integrasi Logika
-"""
+from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
 
-from typing import List, Optional, Set
-from flask import (
-    Blueprint,
-    current_app,
-    jsonify,
-    render_template,
-    request,
-)
+from core import budget
+from core.models import Category
 
-from core.budget import recommend_meals
+bp = Blueprint("main", __name__)
 
-# Inisialisasi Blueprint Flask untuk modularitas rute aplikasi
-main_bp = Blueprint("main", __name__)
+QUICK_AMOUNTS = (10000, 15000, 20000)
+MAX_NOMINAL = 1_000_000
 
 
-def _extract_canteen_list(merchants) -> List[str]:
-    """Mengekstrak daftar nama kantin UI unik dan terurut dari dataset merchant."""
-    canteens = sorted(list({m.canteen_name for m in merchants}))
-    return canteens
+def parse_nominal(raw: Optional[str]) -> int:
+    """Ubah teks nominal menjadi rupiah bulat. Pesan galat menyebut cara memperbaiki."""
+    text = (raw or "").replace(".", "").replace(" ", "")
+    if not text:
+        raise ValueError("Ketik nominal uang makanmu, misalnya 15000.")
+    if text.startswith("-"):
+        raise ValueError("Nominal tidak boleh negatif. Ketik angka lebih dari 0.")
+    if not (text.isascii() and text.isdigit()):
+        raise ValueError("Nominal hanya boleh berisi angka, misalnya 15000 atau 15.000.")
+    value = int(text)
+    if value == 0:
+        raise ValueError("Nominal harus lebih dari 0. Ketik angka seperti 10000.")
+    if value > MAX_NOMINAL:
+        raise ValueError(f"Nominal terlalu besar. Ketik angka sampai {MAX_NOMINAL:,}.".replace(",", "."))
+    return value
 
 
-def _parse_dietary_params(form_or_args) -> Optional[List[str]]:
-    """Mengekstrak preferensi diet (halal, pedas, vegetarian) dari query string atau form data."""
-    raw_list = form_or_args.getlist("dietary")
-    tags: Set[str] = set()
-
-    for item in raw_list:
-        if "," in item:
-            for part in item.split(","):
-                if part.strip():
-                    tags.add(part.strip().lower())
-        elif item.strip():
-            tags.add(item.strip().lower())
-
-    single_val = form_or_args.get("dietary")
-    if single_val and not tags:
-        for part in single_val.split(","):
-            if part.strip():
-                tags.add(part.strip().lower())
-
-    return list(tags) if tags else None
+def _merchants():
+    return current_app.config["MERCHANTS"]
 
 
-@main_bp.route("/", methods=["GET"])
+def _now() -> datetime:
+    return current_app.config.get("NOW") or budget.now_wib()
+
+
+def _status(merchant):
+    """Label status untuk satu merchant: tanggal, usang atau tidak, buka atau tutup."""
+    now = _now()
+    return {
+        "stale": budget.is_stale(merchant, now.date()),
+        "open": budget.is_open(merchant, now.timetz().replace(tzinfo=None)),
+    }
+
+
+@bp.get("/")
 def index():
-    """Halaman Beranda (Home Page): Menampilkan formulir input anggaran dan pilihan cepat."""
-    merchants = current_app.get_merchants()
-    canteens = _extract_canteen_list(merchants)
-    presets = [10000, 15000, 20000, 25000]
-    dietary_options = [
-        {"id": "halal", "label": "Halal"},
-        {"id": "vegetarian", "label": "Vegetarian"},
-        {"id": "pedas", "label": "Pedas"},
-        {"id": "non-spicy", "label": "Tidak Pedas"},
-    ]
-    return render_template(
-        "index.html",
-        canteens=canteens,
-        presets=presets,
-        dietary_options=dietary_options,
-    )
+    return render_template("index.html", quick=QUICK_AMOUNTS, unverified=_any_unverified())
 
 
-@main_bp.route("/recommend", methods=["GET", "POST"])
-def recommend():
-    """Memproses input nominal anggaran dan menyajikan hasil rekomendasi menu atau analisis defisit."""
-    merchants = current_app.get_merchants()
-    canteens = _extract_canteen_list(merchants)
-    presets = [10000, 15000, 20000, 25000]
-    dietary_options = [
-        {"id": "halal", "label": "Halal"},
-        {"id": "vegetarian", "label": "Vegetarian"},
-        {"id": "pedas", "label": "Pedas"},
-        {"id": "non-spicy", "label": "Tidak Pedas"},
-    ]
+def _any_unverified() -> bool:
+    return any(not m.verified for m in _merchants())
 
-    source = request.form if request.method == "POST" else request.args
 
-    # Jika pengguna mengakses URL /recommend via GET tanpa parameter, kembalikan ke beranda
-    raw_budget = source.get("budget")
-    if request.method == "GET" and raw_budget is None:
-        return render_template(
-            "index.html",
-            canteens=canteens,
-            presets=presets,
-            dietary_options=dietary_options,
-        )
-
-    # 1. Validasi Input Anggaran (Budget)
-    if raw_budget is None or str(raw_budget).strip() == "":
-        return render_template(
-            "error.html",
-            code=400,
-            title="Input Budget Wajib Diisi",
-            message="Silakan masukkan nominal anggaran belanja makan yang ingin dicari.",
-        ), 400
-
-    clean_budget_str = str(raw_budget).strip()
+@bp.get("/cari")
+def search():
+    raw = request.args.get("nominal", "")
     try:
-        budget_val = int(clean_budget_str)
-    except ValueError:
-        return render_template(
-            "error.html",
-            code=400,
-            title="Format Budget Tidak Valid",
-            message="Nominal anggaran harus berupa angka Rupiah bulat tanpa simbol mata uang atau huruf.",
-        ), 400
+        nominal = parse_nominal(raw)
+    except ValueError as err:
+        return render_template("index.html", quick=QUICK_AMOUNTS, error=str(err), value=raw,
+                               unverified=_any_unverified()), 400
 
-    if budget_val < 0:
-        return render_template(
-            "error.html",
-            code=400,
-            title="Budget Negatif",
-            message="Nominal anggaran tidak boleh bernilai negatif.",
-        ), 400
-
-    # 2. Ekstraksi Filter Kantin & Tag Diet
-    canteen = source.get("canteen", "").strip() or None
-    dietary_tags = _parse_dietary_params(source)
-
-    # 3. Pengaturan Opsi Paket Kombo (1 Makanan + 1 Minuman)
-    raw_combo = source.get("require_combo")
-    if raw_combo is None:
-        raw_combo = source.get("combo")
-
-    if raw_combo is not None:
-        require_combo = str(raw_combo).lower() not in ("false", "0", "off", "no")
-    else:
-        require_combo = True
-
-    # 4. Panggil Mesin Algoritma Knapsack DP
-    result = recommend_meals(
-        merchants_or_items=merchants,
-        budget=budget_val,
-        canteen_filter=canteen,
-        dietary_preferences=dietary_tags,
-        require_combo=require_combo,
-    )
-
-    return render_template(
-        "results.html",
-        result=result,
-        budget=budget_val,
-        canteen=canteen or "Semua Kantin UI",
-        dietary=dietary_tags or [],
-        require_combo=require_combo,
-        deficit=result.deficit,
-        cheapest_item_price=result.cheapest_item_price,
-        fallback_recommendations=getattr(result, "fallback_recommendations", []),
-        canteens=canteens,
-    )
+    canteen = request.args.get("kantin") or None
+    all_canteens = sorted({m.canteen for m in _merchants()})
+    groups = budget.group_by_canteen(_merchants(), nominal, canteen)
+    shortfall = None
+    if not budget.group_by_canteen(_merchants(), nominal):
+        found = budget.cheapest(_merchants())
+        if found:
+            price, merchant = found
+            shortfall = {"price": price, "merchant": merchant, "gap": price - nominal}
+    cards = {
+        name: [(m, budget.affordable_items(m, nominal), _status(m)) for m in members]
+        for name, members in groups.items()
+    }
+    return render_template("hasil.html", nominal=nominal, cards=cards, canteens=all_canteens,
+                           canteen=canteen, shortfall=shortfall, unverified=_any_unverified())
 
 
-@main_bp.route("/merchants", methods=["GET"])
-def merchants_catalog():
-    """Katalog Stan Kantin: Menampilkan direktori seluruh stan makanan di kantin kampus UI."""
-    merchants = current_app.get_merchants()
-    canteens = _extract_canteen_list(merchants)
-    selected_canteen = request.args.get("canteen", "").strip()
-
-    if selected_canteen:
-        filtered_merchants = [
-            m for m in merchants
-            if selected_canteen.lower() in m.canteen_name.lower()
-        ]
-    else:
-        filtered_merchants = merchants
-
-    return render_template(
-        "merchants.html",
-        merchants=filtered_merchants,
-        all_merchants=merchants,
-        canteens=canteens,
-        selected_canteen=selected_canteen,
-    )
-
-
-@main_bp.route("/api/recommend", methods=["GET"])
-def api_recommend():
-    """Endpoint REST API: Mengembalikan rekomendasi menu dalam format JSON."""
-    raw_budget = request.args.get("budget")
-    if raw_budget is None or str(raw_budget).strip() == "":
-        return jsonify({"status": "ERROR", "message": "Parameter 'budget' wajib disertakan."}), 400
-
+@bp.get("/merchant/<merchant_id>")
+def merchant_detail(merchant_id: str):
+    merchant = next((m for m in _merchants() if m.id == merchant_id), None)
+    if merchant is None:
+        abort(404)
     try:
-        budget_val = int(str(raw_budget).strip())
+        nominal = parse_nominal(request.args.get("nominal"))
     except ValueError:
-        return jsonify({"status": "ERROR", "message": "Parameter 'budget' harus berupa bilangan bulat valid."}), 400
-
-    if budget_val <= 0:
-        return jsonify({"status": "ERROR", "message": "Parameter 'budget' harus lebih besar dari 0."}), 400
-
-    canteen = request.args.get("canteen", "").strip() or None
-    dietary_tags = _parse_dietary_params(request.args)
-    raw_combo = request.args.get("require_combo")
-    if raw_combo is None:
-        raw_combo = request.args.get("combo")
-    require_combo = (
-        str(raw_combo).lower() not in ("false", "0", "off", "no")
-        if raw_combo is not None
-        else True
-    )
-
-    merchants = current_app.get_merchants()
-    result = recommend_meals(
-        merchants_or_items=merchants,
-        budget=budget_val,
-        canteen_filter=canteen,
-        dietary_preferences=dietary_tags,
-        require_combo=require_combo,
-    )
-
-    return jsonify(result.to_dict()), 200
-
-
-@main_bp.route("/api/merchants", methods=["GET"])
-def api_merchants():
-    """Endpoint REST API: Mengembalikan seluruh data merchant dan daftar menu dalam format JSON."""
-    merchants = current_app.get_merchants()
-    canteen_filter = request.args.get("canteen", "").strip().lower()
-
-    if canteen_filter:
-        merchants = [
-            m for m in merchants
-            if canteen_filter in m.canteen_name.lower()
-        ]
-
-    serialized = []
-    for m in merchants:
-        serialized.append({
-            "id": m.id,
-            "name": m.name,
-            "canteen_id": m.canteen_id,
-            "canteen_name": m.canteen_name,
-            "faculty": m.faculty,
-            "rating": m.rating,
-            "description": m.description,
-            "items": [
-                {
-                    "id": it.id,
-                    "name": it.name,
-                    "category": it.category.value if hasattr(it.category, "value") else str(it.category),
-                    "price": it.price,
-                    "satisfaction_score": it.satisfaction_score,
-                    "dietary_tags": sorted(list(it.dietary_tags)),
-                    "merchant_id": it.merchant_id,
-                    "merchant_name": it.merchant_name,
-                    "canteen_name": it.canteen_name,
-                    "faculty": it.faculty,
-                    "calories": it.calories,
-                    "description": it.description,
-                    "is_available": it.is_available,
-                }
-                for it in m.items
-            ],
-        })
-
-    return jsonify({"merchants": serialized, "count": len(serialized)}), 200
+        return redirect(url_for("main.index"))
+    fitting = budget.affordable_items(merchant, nominal)
+    by_category = {c.label: [i for i in fitting if i.category is c] for c in Category}
+    by_category = {label: items for label, items in by_category.items() if items}
+    combo = budget.best_combo(fitting, nominal)
+    return render_template("merchant.html", merchant=merchant, nominal=nominal, by_category=by_category,
+                           combo=combo, combo_total=sum(i.price for i in combo), status=_status(merchant))
