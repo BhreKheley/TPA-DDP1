@@ -1,33 +1,41 @@
-"""Modul Model Data (Data Models) - Smart Meal Finder
-Dasar-Dasar Pemrograman 1 (DDP1) Gasal 2026/2027 - Kelompok 5
+"""Model data: entitas Merchant dan MenuItem, tanpa ketergantungan pada modul lain."""
 
-Modul ini menyediakan referensi dan re-export entitas data utama:
-- Category: Enumerasi kategori menu (food, beverage, snack).
-- MenuItem: Model immutable (frozen dataclass) untuk satu item menu makanan/minuman.
-- Merchant: Model stan penjual kantin kampus UI beserta daftar menunya.
-- Exception Hierarchy: Penanganan error terstruktur untuk validasi data.
+from dataclasses import dataclass
+from datetime import date, time
+from enum import Enum
+from typing import Optional, Tuple
 
-Kontributor:
-- Naisya Alikha Putri (NPM: 2606888276) - Desain Skema & Entitas Data
-- Bhre Nabil Faeyza (NPM: 2606887563) - Reviewer & Integrasi Logika
-"""
 
-from core.loader import (
-    Category,
-    MenuItem,
-    Merchant,
-    MealFinderDataError,
-    DataFileNotFoundError,
-    JSONParseError,
-    DataValidationError,
-)
+class DataError(Exception):
+    """Berkas data hilang, rusak, atau melanggar aturan kualitas data."""
 
-__all__ = [
-    "Category",
-    "MenuItem",
-    "Merchant",
-    "MealFinderDataError",
-    "DataFileNotFoundError",
-    "JSONParseError",
-    "DataValidationError",
-]
+
+class Category(str, Enum):
+    FOOD = "food"
+    BEVERAGE = "beverage"
+    SNACK = "snack"
+
+    @property
+    def label(self) -> str:
+        return {"food": "Makanan", "beverage": "Minuman", "snack": "Camilan"}[self.value]
+
+
+@dataclass(frozen=True)
+class MenuItem:
+    id: str
+    name: str
+    category: Category
+    price: int  # rupiah, bilangan bulat
+
+
+@dataclass(frozen=True)
+class Merchant:
+    id: str
+    name: str
+    canteen: str
+    items: Tuple[MenuItem, ...]
+    updated_at: date  # tanggal harga terakhir dicek
+    verified: bool = False  # True hanya jika harga sudah dicek di lapangan
+    opens: Optional[time] = None
+    closes: Optional[time] = None  # lebih kecil dari opens berarti lewat tengah malam
+    note: str = ""
